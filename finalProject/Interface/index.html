@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dosya Yükleme ve Paylaşım</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Dosya Yükle</h2>
+        <form action="upload.php" method="POST" enctype="multipart/form-data">
+            <label for="file">Dosya Seç:</label>
+            <input type="file" name="file" id="file" required>
+            <button type="submit" name="submit">Yükle</button>
+        </form>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
