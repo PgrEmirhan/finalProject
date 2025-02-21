@@ -1,0 +1,348 @@
+ChatGPT
+
+Oturum aç
+
+Kaydol
+Şunu dedin:
+bana arayüz için html css js ve php ile mysql üzerinden bağlanabileceğim bir dosya yükleme ve paylaşım uygulaması oluştur dosya kaldrıma ve indirme olmalı
+ChatGPT:
+Tabii! Aşağıda, dosya yükleme, indirme ve silme işlemleri yapabileceğiniz temel bir uygulama için HTML, CSS, JavaScript ve PHP kullanarak yazılmış örnek bir uygulama sunuyorum. Bu uygulama MySQL veritabanı ile bağlanacak ve kullanıcıların dosyalarını yüklemelerine, indirmelerine ve silmelerine imkan tanıyacaktır.
+
+Adımlar:
+MySQL Veritabanı Tasarımı:
+
+Dosyaların saklanacağı bir tablo oluşturulacak.
+sql
+Kopyala
+CREATE DATABASE file_sharing;
+
+USE file_sharing;
+
+CREATE TABLE files (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    filename VARCHAR(255) NOT NULL,
+    filepath VARCHAR(255) NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+PHP Kodu:
+
+Dosya yükleme, indirme ve silme işlemlerini yapacak PHP dosyaları yazılacak.
+1. HTML ve CSS (Frontend) - index.html
+html
+Kopyala
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dosya Yükleme ve Paylaşım Uygulaması</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f1f1f1;
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        input[type="file"] {
+            display: block;
+            margin: 20px auto;
+        }
+        .file-list {
+            margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+        .file-list li {
+            padding: 10px;
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+        }
+        .file-list a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .file-list button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dosya Yükleme ve Paylaşım</h1>
+        <form id="uploadForm" action="upload.php" method="post" enctype="multipart/form-data">
+            <input type="file" name="fileToUpload" id="fileToUpload" required>
+            <button type="submit">Dosya Yükle</button>
+        </form>
+        
+        <h2>Yüklenen Dosyalar</h2>
+        <ul class="file-list" id="fileList">
+            <!-- Dosyalar burada listelenecek -->
+        </ul>
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde, dosya listesini güncelle
+        window.onload = function() {
+            fetch('files.php')
+                .then(response => response.json())
+                .then(data => {
+                    const fileList = document.getElementById('fileList');
+                    data.forEach(file => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <a href="uploads/${file.filename}" download>${file.filename}</a>
+                            <button onclick="deleteFile(${file.id})">Sil</button>
+                        `;
+                        fileList.appendChild(li);
+                    });
+                });
+        };
+
+        // Dosya silme fonksiyonu
+        function deleteFile(fileId) {
+            fetch(`delete.php?id=${fileId}`, {
+                method: 'GET'
+            })
+            .then(response => response.text())
+            .then(() => {
+                location.reload(); // Sayfayı yeniden yükle
+            });
+        }
+    </script>
+</body>
+</html>
+2. PHP Dosyaları (Backend)
+upload.php (Dosya Yükleme)
+php
+Kopyala
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "file_sharing";
+
+// Veritabanı bağlantısı
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Bağlantı başarısız: " . $conn->connect_error);
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['fileToUpload'])) {
+    $target_dir = "uploads/";
+    $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+    $uploadOk = 1;
+    $fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+    // Dosya var mı kontrolü
+    if (file_exists($target_file)) {
+        echo "Üzgünüz, dosya zaten var.";
+        $uploadOk = 0;
+    }
+
+    // Dosya boyutunu kontrol et (5MB)
+    if ($_FILES["fileToUpload"]["size"] > 5000000) {
+        echo "Üzgünüz, dosyanız çok büyük.";
+        $uploadOk = 0;
+    }
+
+    // Yalnızca belirli dosya tiplerine izin ver
+    if ($fileType != "jpg" && $fileType != "png" && $fileType != "jpeg" && $fileType != "gif" && $fileType != "pdf") {
+        echo "Üzgünüz, yalnızca JPG, JPEG, PNG, GIF, PDF dosyalarına izin verilir.";
+        $uploadOk = 0;
+    }
+
+    if ($uploadOk == 0) {
+        echo "Dosya yüklenemedi.";
+    } else {
+        if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+            $sql = "INSERT INTO files (filename, filepath) VALUES ('" . basename($_FILES["fileToUpload"]["name"]) . "', '" . $target_file . "')";
+            if ($conn->query($sql) === TRUE) {
+                echo "Dosya başarıyla yüklendi.";
+            } else {
+                echo "Veritabanı hatası: " . $conn->error;
+            }
+        } else {
+            echo "Dosya yüklenemedi.";
+        }
+    }
+}
+$conn->close();
+?>
+files.php (Dosyaları Listeleme)
+php
+Kopyala
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "file_sharing";
+
+// Veritabanı bağlantısı
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Bağlantı başarısız: " . $conn->connect_error);
+}
+
+$sql = "SELECT * FROM files";
+$result = $conn->query($sql);
+
+$files = array();
+
+while ($row = $result->fetch_assoc()) {
+    $files[] = $row;
+}
+
+echo json_encode($files);
+
+$conn->close();
+?>
+delete.php (Dosya Silme)
+php
+Kopyala
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "file_sharing";
+
+// Veritabanı bağlantısı
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Bağlantı başarısız: " . $conn->connect_error);
+}
+
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    // Dosya bilgilerini al
+    $sql = "SELECT * FROM files WHERE id = $id";
+    $result = $conn->query($sql);
+    $file = $result->fetch_assoc();
+
+    if ($file) {
+        // Dosyayı sil
+        if (unlink($file['filepath'])) {
+            $sql = "DELETE FROM files WHERE id = $id";
+            if ($conn->query($sql) === TRUE) {
+                echo "Dosya başarıyla silindi.";
+            } else {
+                echo "Veritabanı hatası: " . $conn->error;
+            }
+        } else {
+            echo "Dos
+
+Şunu dedin:
+devam et
+ChatGPT:
+Tabii! Kaldığımız yerden devam edelim.
+
+delete.php (Dosya Silme İşlemi)
+php
+Kopyala
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "file_sharing";
+
+// Veritabanı bağlantısı
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Bağlantı başarısız: " . $conn->connect_error);
+}
+
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    // Dosya bilgilerini al
+    $sql = "SELECT * FROM files WHERE id = $id";
+    $result = $conn->query($sql);
+    $file = $result->fetch_assoc();
+
+    if ($file) {
+        // Dosyayı sil
+        if (unlink($file['filepath'])) {
+            // Veritabanından dosya kaydını sil
+            $sql = "DELETE FROM files WHERE id = $id";
+            if ($conn->query($sql) === TRUE) {
+                echo "Dosya başarıyla silindi.";
+            } else {
+                echo "Veritabanı hatası: " . $conn->error;
+            }
+        } else {
+            echo "Dosya silinemedi.";
+        }
+    } else {
+        echo "Dosya bulunamadı.";
+    }
+}
+
+$conn->close();
+?>
+Açıklamalar:
+Veritabanı Yapısı:
+
+files tablosu, kullanıcıların yükledikleri dosyaları saklar. Her dosya, bir id, filename (dosya adı) ve filepath (dosyanın dosya yolu) ile kaydedilir.
+Dosya Yükleme (upload.php):
+
+Kullanıcı dosya yüklediğinde, dosya belirli bir klasöre (örneğin uploads/) kaydedilir.
+Yüklenen dosya, veritabanına kaydedilir.
+Yalnızca belirli dosya türlerine izin verilir (örneğin JPG, PNG, PDF gibi).
+Dosya yükleme başarılı ise, veritabanına kayıt yapılır.
+Dosya Listeleme (files.php):
+
+Bu dosya, veritabanındaki tüm dosyaları JSON formatında döndürür. Bu JSON verisi, frontend tarafında dosya listesinin dinamik olarak oluşturulmasına olanak tanır.
+Dosya Silme (delete.php):
+
+Kullanıcı bir dosyayı silmek istediğinde, id parametresi ile dosya veritabanından silinir.
+Veritabanındaki dosya kaydının silinmesinin ardından, dosyanın bulunduğu fiziksel dosya da unlink() fonksiyonu ile sunucudan silinir.
+Dosya Yükleme ve İndirme İşlemleri:
+Yükleme: Kullanıcı, index.html sayfasında dosya seçer ve "Dosya Yükle" butonuna basar. Bu işlem, upload.php dosyasına veri gönderir ve dosya yüklendikten sonra veritabanına kaydedilir.
+İndirme: Dosya, index.html içinde listelendiğinde, her dosya adı bir link olarak görünür. Kullanıcı bu linke tıkladığında, dosya bilgisini içeren bağlantı çalışır ve dosya indirilir.
+Veritabanı Yapılandırması ve Dosya Yolu:
+Uploads Klasörü: Dosyaların sunucuda saklanabilmesi için uploads/ adında bir klasör oluşturmanız gerekmektedir. Bu klasörün yazma izinlerinin doğru olduğundan emin olun.
+Veritabanı Bağlantısı: PHP dosyalarında MySQL bağlantısı için doğru kullanıcı adı, şifre ve veritabanı adı bilgilerini kullanmalısınız.
+uploads/ Klasörü Oluşturma:
+PHP'de dosya yüklerken, dosyaların fiziksel olarak saklanacağı bir dizin gereklidir. Bu nedenle, projenizde uploads/ adında bir klasör oluşturun. Bu klasörün sunucuda yazma izni olması gerekir:
+
+bash
+Kopyala
+mkdir uploads
+chmod 755 uploads
+Güvenlik Önlemleri:
+Dosya yüklerken, dosya türlerini ve boyutlarını kontrol ederek yalnızca güvenli dosyaların yüklenmesine izin veriyoruz.
+Kullanıcıların yalnızca kendi yükledikleri dosyaları silebilmeleri, güvenlik açısından önemlidir.
+Sonuç:
+Bu uygulama, dosya yükleme, listeleme, indirme ve silme işlemleri yapabilen basit bir dosya paylaşım uygulaması sunmaktadır. Frontend kısmında HTML, CSS ve JavaScript kullanırken, backend kısmında PHP ve MySQL kullanarak dosya yönetimi işlemleri yapılmaktadır.
+
+
+
+
+Ekle
+
+Ara
+
+Akıl Yürüt
+
+Voice
+ChatGPT hata yapabilir. Önemli bilgileri kontrol edin.
+?

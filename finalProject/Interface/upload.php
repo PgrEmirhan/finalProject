@@ -1,10 +1,9 @@
 <?php
-$host = 'localhost'; // Veritabanı sunucusu
-$dbname = 'file_sharing'; // Veritabanı adı
-$username = 'root'; // Kullanıcı adı
-$password = ''; // Parola
+$host = 'localhost';
+$dbname = 'file_sharing';
+$username = 'root';
+$password = '';
 
-// Veritabanına bağlantı
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -50,6 +49,34 @@ if (isset($_POST['submit']) && isset($_FILES['file'])) {
     }
 }
 
+// Dosya silme işlemi
+if (isset($_GET['delete'])) {
+    $fileId = $_GET['delete'];
+
+    // Dosya bilgilerini veritabanından al
+    $stmt = $pdo->prepare("SELECT * FROM files WHERE id = ?");
+    $stmt->execute([$fileId]);
+    $file = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($file) {
+        $filePath = $file['file_path'];
+        
+        // Veritabanından sil
+        $stmt = $pdo->prepare("DELETE FROM files WHERE id = ?");
+        $stmt->execute([$fileId]);
+
+        // Fiziksel dosyayı sil
+        if (file_exists($filePath)) {
+            unlink($filePath); // Dosyayı sil
+            echo "Dosya başarıyla silindi!";
+        } else {
+            echo "Dosya sistemde bulunamadı.";
+        }
+    } else {
+        echo "Dosya bulunamadı.";
+    }
+}
+
 // Dosya bilgilerini veritabanından alıyoruz
 $stmt = $pdo->query("SELECT * FROM files");
 ?>
@@ -60,7 +87,45 @@ $stmt = $pdo->query("SELECT * FROM files");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dosya Yükleme ve Paylaşım</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Modal stili */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -73,45 +138,74 @@ $stmt = $pdo->query("SELECT * FROM files");
 
         <h2>Yüklenen Dosyalar</h2>
         <ul id="file-list">
-            <!-- Yüklenen dosyalar burada görünecek -->
             <?php
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $fileUrl = 'uploads/' . basename($row['file_path']);
-                    $shareLink = "http://localhost/finalProject/" . $fileUrl; // Paylaşılabilir link
-                    $fileExt = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
-
+                    $fileUrl = 'http://localhost/finalProject/' . $row['file_path']; // Paylaşılabilir link
                     echo "<li>";
+                    $fileExt = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
+                    // Eğer dosya bir resimse, resim olarak göster
+                    if (in_array($fileExt, ['jpg', 'jpeg', 'png', 'gif'])) {
+                        echo "<img src='$fileUrl' width='100' height='100'>";
+                    }
+                    // Eğer dosya bir video ise, video olarak göster
+                    if (in_array($fileExt, ['mp4', 'avi'])) {
+                        echo "<video width='200' controls><source src='$fileUrl' type='video/mp4'></video>";
+                    }
+                    echo "<br>";
                     echo $row['file_name'];
-                    echo " <button class='download-btn' data-id='" . $row['id'] . "'>İndir</button>"; // İndirme butonu
-                    echo " | <a href='" . $shareLink . "' target='_blank'>Paylaş</a>"; // Paylaşma linki
-                    echo " | <a href='delete.php?id=" . $row['id'] . "'>Sil</a>"; // Silme butonu
+                    echo " <a href='download_file.php?id=" . $row['id'] . "'>İndir</a><br>";
+                    echo "<button class='share-btn' data-link='$fileUrl'>Paylaş</button>"; // Paylaş butonu
+                    echo " <a href='?delete=" . $row['id'] . "' onclick='return confirm(\"Dosyayı silmek istediğinize emin misiniz?\")'>Sil</a>"; // Silme linki
                     echo "</li>";
                 }
             ?>
         </ul>
     </div>
 
-    <script src="scripts.js"></script>
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Paylaşılabilir Link</h2>
+            <input type="text" id="shareLink" readonly>
+            <button id="copyLinkBtn">Kopyala</button>
+        </div>
+    </div>
 
     <script>
-        // AJAX ile dosya indirme işlemi
-        document.querySelectorAll('.download-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                var fileId = this.getAttribute('data-id');
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', 'download.php?id=' + fileId, true);
-                xhr.responseType = 'blob'; // Dosya olarak yanıt alıyoruz
+        // Modal penceresini kontrol et
+        var modal = document.getElementById("myModal");
+        var shareButtons = document.querySelectorAll(".share-btn");
+        var shareLinkInput = document.getElementById("shareLink");
+        var closeModal = document.getElementsByClassName("close")[0];
+        var copyLinkBtn = document.getElementById("copyLinkBtn");
 
-                xhr.onload = function() {
-                    var blob = xhr.response;
-                    var link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = "dosya." + blob.type.split("/")[1]; // Dosya uzantısına göre adlandırma
-                    link.click(); // İndirme başlatma
-                };
-
-                xhr.send();
+        // Paylaş butonlarına tıklanmasıyla modal açılması
+        shareButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                var link = this.getAttribute("data-link");
+                shareLinkInput.value = link;  // Linki modalda göster
+                modal.style.display = "block";  // Modalı göster
             });
+        });
+
+        // Modalı kapatma işlemi
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // Modal dışına tıklanırsa kapatma işlemi
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Kopyalama işlemi
+        copyLinkBtn.addEventListener('click', function() {
+            shareLinkInput.select();
+            document.execCommand('copy');
+            alert('Link kopyalandı!');
         });
     </script>
 </body>
