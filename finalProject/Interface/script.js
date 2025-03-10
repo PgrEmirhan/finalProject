@@ -27,3 +27,22 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(error => console.error("Hata:", error));
 });
+
+// İndir işlemi
+function downloadFile(fileUrl) {
+    window.location.href = "download_file.php?id=" + fileUrl;  // Dosyayı indir
+}
+
+// Silme işlemi
+function deleteFile(fileUrl) {
+    if (confirm("Dosyayı silmek istediğinize emin misiniz?")) {
+        // Veritabanından ve fiziksel olarak dosyayı silme
+        window.location.href = 'delete_file.php?id=' + fileUrl; // Silme işlemi için yönlendirme
+    }
+}
+
+// Paylaşma işlemi
+function shareFile(fileUrl) {
+    const shareLink = window.location.href + "share_file.php?id=" + fileUrl;  // Dosya URL'sini paylaşmak için link oluşturuluyor
+    prompt("Paylaşmak için linki kopyalayın:", shareLink);
+}

@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $host = 'localhost';
 $dbname = 'file_sharing';
 $username = 'root';
@@ -11,28 +13,28 @@ try {
     die("Veritabanı bağlantısı hatası: " . $e->getMessage());
 }
 
-if (isset($_GET['id'])) {
-    $fileId = $_GET['id'];
-    $stmt = $pdo->prepare("SELECT * FROM files WHERE id = ?");
-    $stmt->execute([$fileId]);
+if (isset($_GET['file_id'])) {
+    $file_id = $_GET['file_id'];
+
+    // Dosyayı veritabanından al
+    $stmt = $pdo->prepare("SELECT * FROM files WHERE ID = ?");
+    $stmt->execute([$file_id]);
     $file = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($file) {
-        $filePath = $file['file_path'];
-        if (file_exists($filePath)) {
-            // Dosya başlıklarını ayarla
+        $file_path = $file['file_path'];
+        if (file_exists($file_path)) {
+            // Dosyayı indir
             header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
-            header('Content-Length: ' . filesize($filePath));
-            readfile($filePath); // Dosyayı oku ve gönder
-            exit;
+            header('Content-Disposition: attachment; filename="' . basename($file_path) . '"');
+            header('Content-Length: ' . filesize($file_path));
+            readfile($file_path);
+            exit();
         } else {
             echo "Dosya bulunamadı.";
         }
     } else {
-        echo "Geçersiz dosya ID'si.";
+        echo "Geçersiz dosya.";
     }
-} else {
-    echo "Dosya ID'si belirtilmemiş.";
 }
 ?>

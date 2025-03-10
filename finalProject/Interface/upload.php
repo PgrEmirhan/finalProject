@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $host = 'localhost';
 $dbname = 'file_sharing';
 $username = 'root';
@@ -11,7 +13,11 @@ try {
     die("Veritabanı bağlantısı hatası: " . $e->getMessage());
 }
 
-if (isset($_POST['submit']) && isset($_FILES['file'])) {
+// Anonim dosya yükleme
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+// Dosya yükleme işlemi
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file'])) {
     $file = $_FILES['file'];
 
     // Dosya adı ve yolu
@@ -27,12 +33,12 @@ if (isset($_POST['submit']) && isset($_FILES['file'])) {
 
         if (in_array($fileExt, $allowed)) {
             if ($fileSize < 10000000) { // Maksimum 10MB
-                $fileDestination = 'C:/xampp/htdocs/finalProject/uploads/' . uniqid('', true) . '.' . $fileExt;
+                $fileDestination = __DIR__ . '/uploads/' . uniqid('', true) . '.' . $fileExt;
                 if (move_uploaded_file($fileTmpName, $fileDestination)) {
-                    // Dosya bilgilerini veritabanına kaydet
-                    $sql = "INSERT INTO files (file_name, file_path) VALUES (?, ?)";
+                    // Eğer kullanıcı giriş yapmışsa, user_id ile ekle
+                    $sql = "INSERT INTO files (file_name, file_path, user_id) VALUES (?, ?, ?)";
                     $stmt = $pdo->prepare($sql);
-                    $stmt->execute([$fileName, $fileDestination]);
+                    $stmt->execute([$fileName, $fileDestination, $user_id]);
 
                     echo "Dosya başarıyla yüklendi!";
                 } else {
@@ -48,165 +54,42 @@ if (isset($_POST['submit']) && isset($_FILES['file'])) {
         echo "Dosya yüklenirken bir hata oluştu.";
     }
 }
-
-// Dosya silme işlemi
-if (isset($_GET['delete'])) {
-    $fileId = $_GET['delete'];
-
-    // Dosya bilgilerini veritabanından al
-    $stmt = $pdo->prepare("SELECT * FROM files WHERE id = ?");
-    $stmt->execute([$fileId]);
-    $file = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($file) {
-        $filePath = $file['file_path'];
-        
-        // Veritabanından sil
-        $stmt = $pdo->prepare("DELETE FROM files WHERE id = ?");
-        $stmt->execute([$fileId]);
-
-        // Fiziksel dosyayı sil
-        if (file_exists($filePath)) {
-            unlink($filePath); // Dosyayı sil
-            echo "Dosya başarıyla silindi!";
-        } else {
-            echo "Dosya sistemde bulunamadı.";
-        }
-    } else {
-        echo "Dosya bulunamadı.";
-    }
-}
-
-// Dosya bilgilerini veritabanından alıyoruz
-$stmt = $pdo->query("SELECT * FROM files");
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dosya Yükleme ve Paylaşım</title>
-    <style>
-        /* Modal stili */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
-            padding-top: 60px;
-        }
+<!-- Dosya Yükleme Formu -->
+<form action="upload.php" method="POST" enctype="multipart/form-data">
+    <label for="file">Dosya Seç:</label>
+    <input type="file" name="file" required><br><br>
+    <button type="submit">Dosya Yükle</button>
+</form>
 
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 400px;
-        }
 
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
+    <hr>
 
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Dosya Yükle</h2>
-        <form action="upload.php" method="POST" enctype="multipart/form-data">
-            <label for="file">Dosya Seç:</label>
-            <input type="file" name="file" id="file" required>
-            <button type="submit" name="submit">Yükle</button>
-        </form>
-
-        <h2>Yüklenen Dosyalar</h2>
-        <ul id="file-list">
-            <?php
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $fileUrl = 'http://localhost/finalProject/' . $row['file_path']; // Paylaşılabilir link
-                    echo "<li>";
-                    $fileExt = strtolower(pathinfo($row['file_name'], PATHINFO_EXTENSION));
-                    // Eğer dosya bir resimse, resim olarak göster
-                    if (in_array($fileExt, ['jpg', 'jpeg', 'png', 'gif'])) {
-                        echo "<img src='$fileUrl' width='100' height='100'>";
-                    }
-                    // Eğer dosya bir video ise, video olarak göster
-                    if (in_array($fileExt, ['mp4', 'avi'])) {
-                        echo "<video width='200' controls><source src='$fileUrl' type='video/mp4'></video>";
-                    }
-                    echo "<br>";
-                    echo $row['file_name'];
-                    echo " <a href='download_file.php?id=" . $row['id'] . "'>İndir</a><br>";
-                    echo "<button class='share-btn' data-link='$fileUrl'>Paylaş</button>"; // Paylaş butonu
-                    echo " <a href='?delete=" . $row['id'] . "' onclick='return confirm(\"Dosyayı silmek istediğinize emin misiniz?\")'>Sil</a>"; // Silme linki
-                    echo "</li>";
-                }
-            ?>
+    <!-- Kullanıcının Yüklediği Eski Dosyalar -->
+    <h3>Yüklediğiniz Dosyalar:</h3>
+    <?php if (count($files) > 0): ?>
+        <ul>
+            <?php foreach ($files as $file): ?>
+                <li>
+                    <?php echo htmlspecialchars($file['file_name']); ?> - 
+                    <!-- Dosya İndir Butonu -->
+                    <a href="download_file.php?file_id=<?php echo $file['ID']; ?>">İndir</a> | 
+                    <!-- Dosya Sil Butonu -->
+                    <a href="delete_file.php?id=<?php echo $file['ID']; ?>">Sil</a> | 
+                    <!-- Dosya Paylaş Butonu -->
+                    <a href="share_file.php?id=<?php echo $file['ID']; ?>">Paylaş</a>
+                </li>
+            <?php endforeach; ?>
         </ul>
-    </div>
+    <?php else: ?>
+        <p>Henüz dosya yüklemediniz.</p>
+    <?php endif; ?>
 
-    <!-- Modal -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Paylaşılabilir Link</h2>
-            <input type="text" id="shareLink" readonly>
-            <button id="copyLinkBtn">Kopyala</button>
-        </div>
-    </div>
+    <!-- Çıkış Butonu -->
+    <form action="upload.php" method="POST">
+        <button type="submit" name="logout">Çıkış Yap</button>
+    </form>
 
-    <script>
-        // Modal penceresini kontrol et
-        var modal = document.getElementById("myModal");
-        var shareButtons = document.querySelectorAll(".share-btn");
-        var shareLinkInput = document.getElementById("shareLink");
-        var closeModal = document.getElementsByClassName("close")[0];
-        var copyLinkBtn = document.getElementById("copyLinkBtn");
-
-        // Paylaş butonlarına tıklanmasıyla modal açılması
-        shareButtons.forEach(button => {
-            button.addEventListener("click", function() {
-                var link = this.getAttribute("data-link");
-                shareLinkInput.value = link;  // Linki modalda göster
-                modal.style.display = "block";  // Modalı göster
-            });
-        });
-
-        // Modalı kapatma işlemi
-        closeModal.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        // Modal dışına tıklanırsa kapatma işlemi
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-
-        // Kopyalama işlemi
-        copyLinkBtn.addEventListener('click', function() {
-            shareLinkInput.select();
-            document.execCommand('copy');
-            alert('Link kopyalandı!');
-        });
-    </script>
 </body>
 </html>

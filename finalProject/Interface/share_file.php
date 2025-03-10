@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $host = 'localhost';
 $dbname = 'file_sharing';
 $username = 'root';
@@ -11,30 +13,25 @@ try {
     die("Veritabanı bağlantısı hatası: " . $e->getMessage());
 }
 
-// Dosya bilgilerini veritabanından alıyoruz
-$stmt = $pdo->query("SELECT * FROM files");
-?>
+if (isset($_GET['id'])) {
+    $file_id = $_GET['id'];
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dosya Paylaşımı</title>
-</head>
-<body>
-    <h2>Yüklenen Dosyalar</h2>
-    <ul>
-        <?php
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $fileUrl = 'http://localhost/finalProject/' . $row['file_path']; // Paylaşılabilir link
-                echo "<li>";
-                echo $row['file_name'];
-                echo " <a href='" . $fileUrl . "' download>İndir</a> | ";
-                echo "<a href='" . $fileUrl . "' target='_blank'>Paylaş</a>"; // Paylaşma linki
-                echo "</li>";
-            }
-        ?>
-    </ul>
-</body>
-</html>
+    // Dosyayı veritabanından al
+    $stmt = $pdo->prepare("SELECT * FROM files WHERE ID = ?");
+    $stmt->execute([$file_id]);
+    $file = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($file) {
+        $file_name = $file['file_name'];
+        $file_path = $file['file_path'];
+
+        // Paylaşılacak URL
+        $share_url = "http://localhost/" . $file_path;
+
+        // Paylaşım linkini göster
+        echo "Dosya Paylaşım Linki: <a href='$share_url' target='_blank'>$share_url</a>";
+    } else {
+        echo "Dosya bulunamadı!";
+    }
+}
+?>
