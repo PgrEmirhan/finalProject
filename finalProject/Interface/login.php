@@ -26,8 +26,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
 
-        // Giriş başarılı, anasayfaya yönlendir
-        header("Location: index.php");
+        // Giriş başarılı, upload'a yönlendir
+        header("Location: upload.php");
         exit();
     } else {
         echo "Hatalı kullanıcı adı veya şifre!";

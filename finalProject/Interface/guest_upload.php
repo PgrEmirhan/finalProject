@@ -14,6 +14,7 @@ try {
 }
 
 $fileToShow = null;
+$message = "";  // Mesajları burada tutacağız
 
 // Dosya Yükleme
 if (isset($_POST['upload']) && isset($_FILES['file'])) {
@@ -38,52 +39,32 @@ if (isset($_POST['upload']) && isset($_FILES['file'])) {
                     'file_name' => $fileName,
                     'file_path' => $fileDestination
                 ];
-                echo "<p>Dosya başarıyla yüklendi!</p>";
+                $message = "<p>Dosya başarıyla yüklendi!</p>";
             } else {
-                echo "Dosya yüklenirken bir hata oluştu.";
+                $message = "<p>Dosya yüklenirken bir hata oluştu.</p>";
             }
         } else {
-            echo "Geçersiz dosya formatı veya dosya çok büyük!";
+            $message = "<p>Geçersiz dosya formatı veya dosya çok büyük!</p>";
         }
     } else {
-        echo "Dosya yüklenirken bir hata oluştu.";
+        $message = "<p>Dosya yüklenirken bir hata oluştu.</p>";
     }
 }
 
-// AJAX İsteklerini İşleme
-if (isset($_POST['action']) && isset($_POST['file_path'])) {
-    $file = $_POST['file_path'];
-
-    if ($_POST['action'] == 'delete') {
-        if (file_exists($file)) {
-            if (unlink($file)) {
-                // Veritabanından dosyayı sil
-                $stmt = $pdo->prepare("DELETE FROM files WHERE file_path = :file_path");
-                $stmt->execute([':file_path' => $file]);
-
-                echo json_encode(["status" => "success", "message" => "Dosya başarıyla silindi."]);
-            } else {
-                echo json_encode([
-                    "status" => "error",
-                    "message" => "Dosya silinemedi!",
-                    "file_path" => $file,
-                    "error" => error_get_last()
-                ]);
-            }
+// Dosya Silme
+if (isset($_GET['delete_file'])) {
+    $file_path = $_GET['delete_file'];
+    if (file_exists($file_path)) {
+        if (unlink($file_path)) {
+            // Dosya veritabanından sil
+            $stmt = $pdo->prepare("DELETE FROM files WHERE file_path = :file_path");
+            $stmt->execute([':file_path' => $file_path]);
+            $message = "<p>Dosya başarıyla silindi!</p>";
         } else {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Dosya bulunamadı!",
-                "file_path" => $file
-            ]);
+            $message = "<p>Dosya silinirken bir hata oluştu.</p>";
         }
-        exit();
-    }
-
-    if ($_POST['action'] == 'share' && file_exists($file)) {
-        $share_url = "http://localhost/guest_upload.php?action=download&file=" . urlencode($file);
-        echo json_encode(["status" => "success", "share_url" => $share_url]);
-        exit();
+    } else {
+        $message = "<p>Dosya bulunamadı!</p>";
     }
 }
 
@@ -97,7 +78,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'download' && isset($_GET['file
         readfile($file);
         exit();
     } else {
-        echo "Dosya bulunamadı!";
+        $message = "<p>Dosya bulunamadı!</p>";
     }
 }
 ?>
@@ -108,37 +89,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'download' && isset($_GET['file
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Misafir Dosya Yükle</title>
-    <script>
-        function handleAction(action, filePath) {
-            var formData = new FormData();
-            formData.append("action", action);
-            formData.append("file_path", filePath);
-
-            fetch("", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Gelen Cevap:", data);
-                alert(data.message); // Mesajı göster
-
-                if (action === "delete" && data.status === "success") {
-                    location.reload();
-                } else if (action === "delete" && data.status === "error") {
-                    console.error("Silme Hatası:", data);
-                }
-
-                if (action === "share" && data.status === "success") {
-                    document.getElementById("shareLink").innerHTML = 'Paylaşım Linki: <a href="' + data.share_url + '" target="_blank">' + data.share_url + '</a>';
-                }
-            })
-            .catch(error => console.error("Hata:", error));
-        }
-    </script>
-
     <style>
-        /* Genel sayfa ve body stilleri */
         body {
             font-family: 'Arial', sans-serif;
             background-color: #F0F0F0;
@@ -158,11 +109,11 @@ if (isset($_GET['action']) && $_GET['action'] == 'download' && isset($_GET['file
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             max-width: 500px;
             width: 100%;
+            text-align: center; 
         }
 
         h2 {
             font-size: 28px;
-            text-align: center;
             margin-bottom: 20px;
             color: #4CAF50;
         }
@@ -198,12 +149,16 @@ if (isset($_GET['action']) && $_GET['action'] == 'download' && isset($_GET['file
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            height: 50px;  /* Buton yüksekliklerini eşitlemek için */
+            display: inline-block;
+            width: 100%;
         }
 
         button:hover {
             background-color: #45a049;
         }
 
+        /* Dosya bilgileri kutusu */
         .file-info {
             background-color: #f8f8f8;
             padding: 20px;
@@ -211,82 +166,124 @@ if (isset($_GET['action']) && $_GET['action'] == 'download' && isset($_GET['file
             margin-top: 20px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             text-align: center;
+            position: relative;
         }
 
-        .file-info a {
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
+        /* Paylaşılabilir link gizlenmişken ekran dışında kalacak */
+        #shareLink {
+            display: none; /* Başlangıçta gizli */
+            position: absolute;  
+            top: 120%; /* Paylaşım linkini daha aşağıya yerleştir */
+            left: 50%;
+            transform: translateX(-50%); /* Ortalamak için */
+            margin-top: 10px;
+            word-wrap: break-word;
+            max-width: 100%;
+            text-align: left;
         }
 
-        .file-info a:hover {
-            color: #388E3C;
-        }
-
-        .file-info button {
-            margin: 10px 5px;
-            background-color: #F44336;
-            transition: background-color 0.3s ease;
-        }
-
-        .file-info button:hover {
-            background-color: #D32F2F;
-        }
-
+        /* Link ve butonları düzenleyelim */
         #shareLink a {
             color: #4CAF50;
             text-decoration: none;
-        }
-
-        #shareLink a:hover {
-            text-decoration: underline;
-        }
-
-        .message {
-            margin-top: 20px;
-            font-size: 18px;
-            color: green;
-        }
-
-        /* Anasayfaya dön butonu */
-        .back-home-link {
-            display: block;
-            text-align: center;
-            margin-top: 30px;
-            font-size: 18px;
-            color: #4CAF50;
             font-weight: bold;
-            transition: color 0.3s ease;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Butonlar için genel stil */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .action-buttons button { 
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            height: 50px;  /* Buton yüksekliğini eşitlemek için */
+        }
+
+        .delete-btn {
+            background-color: #FF5733;
+        }
+
+        .delete-btn:hover {
+            background-color: #D32F2F;
+        }
+
+        /* Butonların üzerine gelince renk değişimi */
+        .action-buttons button:hover {
+            background-color: #45a049;
+        }
+
+        /* Paylaş butonunun rengi */
+        button.share-btn {
+            background-color: #3b82f6;
+        }
+
+        button.share-btn:hover {
+            background-color: #2563eb;
+        }
+
+        /* İndir ve ana sayfaya dön bağlantı stilleri */
+        .back-home-link {
             text-decoration: none;
+            color: white;
+            background-color: #3b82f6;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            display: inline-block;
+            margin-top: 10px;
         }
 
         .back-home-link:hover {
-            color: #388E3C;
+            background-color: #2563eb;
         }
 
-        /* Mobil uyumlu tasarım */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-            }
-
-            h2 {
-                font-size: 24px;
-            }
-
-            button {
-                padding: 10px 20px;
-                font-size: 14px;
-            }
-
-            input[type="file"] {
-                padding: 10px;
-                font-size: 14px;
-            }
+        /* İndir Butonunun tasarımı */
+        .btn-download {
+            background-color: #3b82f6;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            font-size: 16px; 
+            width: 100%; /* Buton genişliğini %100 yapalım */
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
         }
+
+        .btn-download:hover {
+            background-color: #2563eb;
+        }
+
     </style>
+    <script>
+        function confirmDelete(filePath) {
+            if (confirm('Silmek istediğinizden emin misiniz?')) {
+                window.location.href = '?delete_file=' + encodeURIComponent(filePath);
+            }
+        }
+
+        // Paylaş butonuna tıklama fonksiyonu
+        function toggleShareLink() {
+            var shareLinkDiv = document.getElementById('shareLink');
+            if (shareLinkDiv.style.display === "none" || shareLinkDiv.style.display === "") {
+                shareLinkDiv.style.display = "block";  // Linki göster
+            } else {
+                shareLinkDiv.style.display = "none";   // Linki gizle
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -297,14 +294,24 @@ if (isset($_GET['action']) && $_GET['action'] == 'download' && isset($_GET['file
             <button type="submit" name="upload">Dosya Yükle</button>
         </form>
 
+        <?php echo $message; ?> <!-- Mesajları buraya ekliyoruz -->
+
         <?php if ($fileToShow): ?>
             <div class="file-info">
                 <h3>Yüklenen Dosya</h3>
                 <p><strong>Dosya Adı:</strong> <?php echo htmlspecialchars($fileToShow['file_name']); ?></p>
-                <a href="?action=download&file=<?php echo urlencode($fileToShow['file_path']); ?>">İndir</a><br>
-                <button onclick="handleAction('share', '<?php echo htmlspecialchars($fileToShow['file_path']); ?>')">Paylaş</button>
-                <button onclick="handleAction('delete', '<?php echo htmlspecialchars($fileToShow['file_path']); ?>')">Sil</button>
-                <p id="shareLink"></p>
+                <div class="action-buttons">
+                    <a href="?action=download&file=<?php echo urlencode($fileToShow['file_path']); ?>" class="btn-download">İndir</a>
+                    <button class="delete-btn" onclick="confirmDelete('<?php echo $fileToShow['file_path']; ?>')">Sil</button>
+                    <button class="share-btn" onclick="toggleShareLink()">Paylaş</button>
+                    <div id="shareLink">
+                        <p><strong>Paylaşılabilir Link:</strong> 
+                            <a href="http://localhost/finalProject/Interface/uploads/<?php echo basename($fileToShow['file_path']); ?>" target="_blank">
+                                http://localhost/finalProject/Interface/uploads/<?php echo basename($fileToShow['file_path']); ?>
+                            </a>
+                        </p>
+                    </div>
+                </div>
             </div>
         <?php endif; ?>
 
