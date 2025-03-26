@@ -29,7 +29,7 @@ try {
 }
 
 $user_id = $_SESSION['user_id'];
-$username = $_SESSION['username']; // Kullanıcı adını oturumdan al
+$username = $_SESSION['user_name']; // Kullanıcı adını oturumdan al
 
 // Dosya yükleme işlemi
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file'])) {
@@ -71,18 +71,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file'])) {
 
 // Dosya silme işlemi
 if (isset($_GET['delete_file'])) {
-    $file_id = $_GET['delete_file'];
+    $file_id_to_delete = $_GET['delete_file'];
     // Dosya bilgilerini almak için veritabanı sorgusu
-    $stmt = $pdo->prepare("SELECT * FROM files WHERE ID = ? AND user_id = ?");
-    $stmt->execute([$file_id, $user_id]);
+    $stmt = $pdo->prepare("SELECT * FROM files WHERE file_id = ? AND user_id = ?");
+    $stmt->execute([$file_id_to_delete, $user_id]);
     $file = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($file) {
         // Sunucudaki dosyayı sil
         if (unlink($file['file_path'])) {
             // Veritabanından dosyayı sil
-            $stmt = $pdo->prepare("DELETE FROM files WHERE ID = ?");
-            $stmt->execute([$file_id]);
+            $stmt = $pdo->prepare("DELETE FROM files WHERE file_id = ?");
+            $stmt->execute([$file_id_to_delete]);
             $uploadMessage = "<p class='success-msg'>Dosya başarıyla silindi.</p>";
         } else {
             $uploadMessage = "<p class='error-msg'>Dosya silinirken bir hata oluştu.</p>";
@@ -92,9 +92,9 @@ if (isset($_GET['delete_file'])) {
 
 // Dosya paylaşma işlemi
 if (isset($_GET['share_file'])) {
-    $file_id = $_GET['share_file'];
-    $stmt = $pdo->prepare("SELECT * FROM files WHERE ID = ? AND user_id = ?");
-    $stmt->execute([$file_id, $user_id]);
+    $file_id_to_share = $_GET['share_file'];
+    $stmt = $pdo->prepare("SELECT * FROM files WHERE file_id = ? AND user_id = ?");
+    $stmt->execute([$file_id_to_share, $user_id]);
     $file = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($file) {
@@ -281,9 +281,9 @@ if (isset($_GET['share_file'])) {
             ?>
                 <div>
                     <?php echo htmlspecialchars($file['file_name']); ?> - 
-                    <a href="download_file.php?file_id=<?php echo $file['ID']; ?>">İndir</a> | 
-                    <a href="javascript:void(0);" onclick="confirmDelete(<?php echo $file['ID']; ?>)">Sil</a> | 
-                    <a href="upload.php?share_file=<?php echo $file['ID']; ?>">Paylaş</a>
+                    <a href="download_file.php?file_id=<?php echo $file['file_id']; ?>">İndir</a> | 
+                    <a href="javascript:void(0);" onclick="confirmDelete(<?php echo $file['file_id']; ?>)">Sil</a> | 
+                    <a href="upload.php?share_file=<?php echo $file['file_id']; ?>">Paylaş</a>
                 </div>
             <?php endforeach; else: ?>
                 <p>Henüz dosya yüklemediniz.</p>

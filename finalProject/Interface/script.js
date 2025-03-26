@@ -46,3 +46,6 @@ function shareFile(fileUrl) {
     const shareLink = window.location.href + "share_file.php?id=" + fileUrl;  // Dosya URL'sini paylaşmak için link oluşturuluyor
     prompt("Paylaşmak için linki kopyalayın:", shareLink);
 }
+window.addEventListener("load", function () {
+    document.body.classList.add("loaded");
+});

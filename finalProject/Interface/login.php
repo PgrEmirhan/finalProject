@@ -18,13 +18,13 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $input_password = $_POST['password'];
 
     // Kullanıcıyı veritabanından sorgula
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE user_name = ?");
     $stmt->execute([$input_username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($input_password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
+    if ($user && password_verify($input_password, $user['user_password'])) {
+        $_SESSION['user_id'] = $user['user_id'];
+        $_SESSION['user_name'] = $user['user_name'];
 
         // Giriş başarılı, upload'a yönlendir
         header("Location: upload.php");
@@ -42,116 +42,166 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giriş Yap</title>
     <style>
-        /* Animasyon ve stil ayarları */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f7f9fc;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            opacity: 0;
-            animation: fadeInPage 1s forwards;
-        }
+     /* Ana Sayfa Tasarımı */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box; /* Tüm öğeler için box modelini düzenler */
+    overflow: hidden; /* Sayfa taşmasını engeller */
+}
 
-        .form-container {
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            transform: translateY(-50px);
-            opacity: 0;
-            animation: slideIn 1s ease-in-out forwards;
-        }
+/* Form container */
+.form-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box; /* İçerik alanını düzgün hizalar */
+    transition: transform 0.3s ease-in-out;
+    min-height: 400px; /* Minimum yükseklik */
+}
 
-        h2 {
-            text-align: center;
-            color: #4CAF50;
-            font-size: 36px;
-            margin-bottom: 30px;
-        }
+.form-container:hover {
+    transform: scale(1.05);
+}
 
-        .form-container input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 2px solid #ddd;
-            font-size: 16px;
-            opacity: 0;
-            animation: fadeInInput 1s ease-in-out forwards;
-        }
+h2 {
+    text-align: center;
+    color: #4CAF50;
+    font-size: 28px;
+    margin-bottom: 25px;
+}
 
-        .form-container button {
-            width: 100%;
-            padding: 15px;
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            border-radius: 8px;
-            opacity: 0;
-            animation: fadeInButton 1s ease-in-out forwards;
-        }
+.form-container input {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* Padding dahil genişlik hesaplama */
+}
 
-        .form-container button:hover {
-            background-color: #45a049;
-        }
+.form-container input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
 
-        .link-container {
-            margin-top: 15px;
-            text-align: center;
-        }
+.form-container button {
+    width: 100%;
+    padding: 15px;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
 
-        .link-container a {
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: bold;
-        }
+.form-container button:hover {
+    background-color: #45a049;
+}
 
-        .link-container a:hover {
-            text-decoration: underline;
-        }
+.form-container button:active {
+    transform: scale(0.98);
+}
 
-        .back-to-home {
-            text-align: center;
-            margin-top: 20px;
-        }
+.form-container a {
+    text-align: center;
+    display: block;
+    margin-top: 15px;
+    color: #4CAF50;
+    text-decoration: none;
+    font-size: 16px;
+}
 
-        .back-to-home a {
-            color: #4CAF50;
-            font-size: 16px;
-            text-decoration: none;
-        }
+.form-container a:hover {
+    text-decoration: underline;
+}
 
-        .back-to-home a:hover {
-            text-decoration: underline;
-        }
+/* Responsive Tasarım */
+@media (max-width: 1024px) {
+    body {
+        padding: 0 20px; /* Sayfanın kenarlarına biraz boşluk bırak */
+        justify-content: flex-start;
+    }
 
-        @keyframes fadeInPage {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
+    .form-container {
+        padding: 20px;
+        max-width: 90%;
+        min-height: 400px;
+    }
 
-        @keyframes slideIn {
-            0% { transform: translateY(-50px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
+    h2 {
+        font-size: 24px;
+    }
 
-        @keyframes fadeInInput {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
+    .form-container input,
+    .form-container button {
+        font-size: 14px;
+        padding: 12px;
+    }
+}
 
-        @keyframes fadeInButton {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
+@media (max-width: 768px) {
+    .form-container {
+        padding: 20px;
+        max-width: 90%;
+        min-height: 350px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    .form-container input,
+    .form-container button {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .form-container a {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 0 10px; /* Mobilde kenarlarda boşluk bırak */
+    }
+
+    .form-container {
+        padding: 15px;
+        max-width: 100%;
+        min-height: 300px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .form-container input,
+    .form-container button {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .form-container a {
+        font-size: 12px;
+    }
+}
+
     </style>
 </head>
 <body>

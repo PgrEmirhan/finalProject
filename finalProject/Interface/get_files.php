@@ -24,7 +24,7 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <li>
             <strong><?php echo htmlspecialchars($file['file_name']); ?></strong> 
             - <?php echo round($file['file_size'] / 1024, 2); ?> KB 
-            <a href="download_file.php?file_id=<?php echo $file['ID']; ?>">İndir</a>
+            <a href="download_file.php?file_id=<?php echo $file['file_id']; ?>">İndir</a>
         </li>
     <?php endforeach; ?>
 </ul>
