@@ -23,15 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'emirhankot423@gmail.com'; // Gmail adresiniz
-        $mail->Password   = 'njof ieco vzkw gqyy';    // Gmail uygulama şifresi
+        $mail->Username   = 'tefsharing@gmail.com'; // Gmail adresiniz
+        $mail->Password   = 'vmze zuwg xorr vasq';    // Gmail uygulama şifresi
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
         $mail->CharSet = 'UTF-8';   
 
         // Gönderen / Alıcı
         $mail->setFrom('emirhankot423@gmail.com', 'İletişim Formu');
-        $mail->addAddress('emirhankot423@gmail.com'); // Kendinize veya destek adresinize gönderin
+        $mail->addAddress('tefsharing@gmail.com'); // Kendinize veya destek adresinize gönderin
 
         // İçerik
         $mail->isHTML(false);

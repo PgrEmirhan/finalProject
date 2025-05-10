@@ -1,60 +1,71 @@
-<?php
+<?php 
 session_start();
+
+$host = 'localhost';
+$dbname = 'file_sharing';
+$username = 'root';
+$password = '';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Veritabanı bağlantısı hatası: " . $e->getMessage());
+}
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// Kullanıcı giriş kontrolü
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-} 
-// PHPMailer kütüphaneleri
 require 'src/PHPMailer.php';
 require 'src/SMTP.php';
 require 'src/Exception.php';
+$token = bin2hex(random_bytes(16)); // 32 karakterlik benzersiz token
+$share_link = "http://localhost/finalProject/Frontend/download.php?link=" . $token;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Alınan veriler
-    $recipientEmail = $_POST['recipient'];  // Alıcı e-posta adresi
-    $fileLink = $_POST['file_link'];  // Paylaşılan dosya linki
+    $file_id = $_POST['file_id'];
+    $recipient = $_POST['recipient'];
+    $share_link = $_POST['file_link'];
+    $share_type = $_POST['shareType'];
+    $password = !empty($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : null;
+    $expiry_days = intval($_POST['expiry_days']);
+    $max_downloads = !empty($_POST['max_downloads']) ? intval($_POST['max_downloads']) : null;
 
-    // Dosya adı ve mesaj içeriği
-    $subject = "Paylaşılan Dosya Linki";
-    $message = "Merhaba,\n\nBu mesaj, bir dosya paylaşımı içermektedir. Aşağıdaki linkten dosyayı indirebilirsiniz:\n\n" . $fileLink . "\n\nİyi günler.";
+    $expiry_date = date('Y-m-d H:i:s', strtotime("+$expiry_days days"));
+    $created_at = date('Y-m-d H:i:s');
 
-    // PHPMailer ile e-posta gönderimi
-    $mail = new PHPMailer(true);
+    // Veritabanına kaydet
+    $stmt = $pdo->prepare("INSERT INTO shares (file_id, recipient_email, share_type, password, expiry_date, max_downloads, download_count, share_link, created_at) 
+                           VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)");
+    $stmt->execute([$file_id, $recipient, $share_type, $password, $expiry_date, $max_downloads, $share_link, $created_at]);
 
-    try {
-        // SMTP yapılandırması
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';  // SMTP sunucusu (Gmail kullanıyorsanız)
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'emirhankot423@gmail.com';  // Buraya kendi Gmail adresinizi yazın
-        $mail->Password   = 'njof ieco vzkw gqyy';  // Buraya Gmail şifrenizi yazın (Yoksa uygulama şifresi kullanabilirsiniz)
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
-        $mail->CharSet = 'UTF-8';
+ $mail = new PHPMailer(true);
 
-        // Gönderen e-posta bilgileri
-        $mail->setFrom('your-email@gmail.com', 'Dosya Paylaşımı');  // Burada kendi e-posta adresinizi kullanın
-        $mail->addAddress($recipientEmail);  // Alıcı e-posta adresi
+try {
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.gmail.com';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = 'tefsharing@gmail.com'; // Gönderen Gmail
+    $mail->Password   = 'vmze zuwg xorr vasq';   // App password
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port       = 587;
+    $mail->CharSet    = 'UTF-8';
 
-        // E-posta içeriği
-        $mail->Subject = $subject;
-        $mail->Body    = $message;
+    $mail->setFrom('tefsharing@gmail.com', 'Tef File Sharing'); // Gönderen adı
+    $mail->addAddress($recipient); // Alıcı mail adresi
 
-        // E-posta gönderme işlemi
-        if ($mail->send()) {
-            echo "Dosya başarıyla paylaşıldı!";
-        } else {
-            echo "E-posta gönderilemedi. Hata: " . $mail->ErrorInfo;
-        }
-    } catch (Exception $e) {
-        echo "E-posta gönderilemedi. Hata: " . $mail->ErrorInfo;
-    }
+    $mail->isHTML(true);
+    $mail->Subject = 'Dosya Paylaşımı';
+    $mail->Body    = "Size bir dosya paylaşıldı: <a href='$share_link'>$share_link</a>";
+
+    $mail->send();
+    echo "Paylaşım başarılı. E-posta gönderildi.";
+} catch (Exception $e) {
+    echo "Paylaşım kaydedildi ama e-posta gönderilemedi. Hata: {$mail->ErrorInfo}";
+}
+
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="tr">
@@ -64,15 +75,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Dosya Paylaş</title>
 </head>
 <body>
-    <h1>Dosya Paylaş</h1>
-    <form action="shareFile.php" method="POST">
-        <label for="recipient">Alıcı E-posta:</label>
-        <input type="email" id="recipient" name="recipient" required><br><br>
+<form action="shareFile.php" method="POST">
+    <input type="hidden" name="file_id" value="1"> <!-- örnek ID -->
+    
+    <label for="recipient">Alıcı E-posta:</label>
+    <input type="email" id="recipient" name="recipient" required><br><br>
 
-        <label for="file_link">Paylaşılan Dosya Linki:</label>
-        <input type="text" id="file_link" name="file_link" required><br><br>
+    <label for="file_link">Paylaşılan Dosya Linki:</label>
+    <input type="text" id="file_link" name="file_link" required><br><br>
 
-        <input type="submit" value="Paylaş">
-    </form>
+    <label for="shareType">Paylaşım Türü:</label>
+    <select name="shareType" id="shareType">
+        <option value="private">Özel</option>
+        <option value="public">Genel</option>
+    </select><br><br>
+
+    <label for="password">Şifre (isteğe bağlı):</label>
+    <input type="text" id="password" name="password"><br><br>
+
+    <label for="expiry_days">Geçerlilik Süresi (gün):</label>
+    <input type="number" id="expiry_days" name="expiry_days" value="7"><br><br>
+
+    <label for="max_downloads">Maksimum İndirme Sayısı (isteğe bağlı):</label>
+    <input type="number" id="max_downloads" name="max_downloads"><br><br>
+
+    <input type="submit" value="Paylaş">
+</form>
+
 </body>
 </html>

@@ -57,7 +57,9 @@ if (isset($_GET['token'])) {
     <h2>Yeni Şifre Belirleyin</h2>
     <form method="POST">
         <label for="new_password">Yeni Şifreniz:</label><br>
-        <input type="password" name="new_password" id="new_password" required><br><br>
+        <input type="password" name="new_password" id="new_password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+         title="Parola en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir."
+         required><br><br>
         <input type="submit" value="Şifreyi Sıfırla">
     </form>
 </body>
