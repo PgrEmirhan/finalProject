@@ -27,25 +27,67 @@
     $user_id = $_SESSION['user_id'];   
     $username = $_SESSION['user_name'];
 
+$query = $pdo->prepare("SELECT * FROM users WHERE user_name = ?");
+$query->execute([$username]);
+$user = $query->fetch();
+
+$membership = $user['membership_type']; // Üyelik türünü alıyoruz
 $sql = "SELECT * FROM files WHERE user_id = ?";
 $params = [$user_id];
 
-// Uzantı filtresi
-if (!empty($_GET['type'])) {
-    $sql .= " AND file_name LIKE ?";
-    $params[] = "%." . ltrim($_GET['type'], '.'); // baştaki noktayı temizle
+if ($membership != 'free') {
+    if (!empty($_GET['type'])) {
+        $sql .= " AND file_name LIKE ?";
+        $params[] = "%." . ltrim($_GET['type'], '.'); // baştaki noktayı temizle
+    }
+
+    if (!empty($_GET['min_size']) && is_numeric($_GET['min_size'])) {
+        $sql .= " AND file_size >= ?";
+        $params[] = (int)$_GET['min_size'];
+    }
+
+    if (!empty($_GET['max_size']) && is_numeric($_GET['max_size'])) {
+        $sql .= " AND file_size <= ?";
+        $params[] = (int)$_GET['max_size'];
+    }
 }
 
-// Minimum boyut filtresi
-if (!empty($_GET['min_size']) && is_numeric($_GET['min_size'])) {
-    $sql .= " AND file_size >= ?";
-    $params[] = (int)$_GET['min_size'];
-}
+// Kullanıcının şu ana kadar yüklediği toplam dosya boyutunu al
+$stmt = $pdo->prepare("SELECT SUM(file_size) AS total_size FROM files WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+$totalUsed = $result['total_size'] ?? 0; // Bayt cinsinden
+// Kota sınırlarını byte cinsinden belirleyelim
+$maxQuota = 0;
+$maxFileSize = 0;
 
-// Maksimum boyut filtresi
-if (!empty($_GET['max_size']) && is_numeric($_GET['max_size'])) {
-    $sql .= " AND file_size <= ?";
-    $params[] = (int)$_GET['max_size'];
+switch ($membership) {
+    case 'free':
+        $maxQuota = 10 * 1024 * 1024; // 10 MB
+        $maxFileSize = 10 * 1024 * 1024;
+        break;
+    case 'monthly':
+        $maxQuota = 1024 * 1024 * 1024; // 1 GB
+        $maxFileSize = 200 * 1024 * 1024; // örnek: 200 MB dosya sınırı
+        break;
+    case 'yearly':
+        $maxQuota = 5 * 1024 * 1024 * 1024; // 5 GB
+        $maxFileSize = 500 * 1024 * 1024; // örnek: 500 MB dosya sınırı
+        break;
+}
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file'])) {
+    $file = $_FILES['file'];
+    $fileSize = $file['size'];
+
+    // KOTA KONTROLÜ
+    if (($totalUsed + $fileSize) > $maxQuota) {
+        $uploadMessage = "<p class='error-msg'>Yükleme sınırınızı aştınız. Üyeliğinize uygun maksimum kapasiteyi doldurdunuz.</p>";
+    } elseif ($fileSize > $maxFileSize) {
+        $uploadMessage = "<p class='error-msg'>Bu dosya üyelik türünüz için çok büyük. Maksimum izin verilen dosya boyutu: " . round($maxFileSize / 1024 / 1024) . " MB</p>";
+    } else {
+        // Devam et: burada dosya taşınması, veritabanına yazılması vb. işlemler olur
+        // Şu anki mevcut dosya yükleme kodlarını buraya yerleştirirsiniz
+    }
 }
 
 $stmt = $pdo->prepare($sql);
@@ -98,37 +140,39 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['files'])) {
-    $files = $_POST['files'];
+if ($membership != 'free' && count($files) > 0) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['files'])) {
+        $files = $_POST['files'];
 
-    $zip = new ZipArchive();
-    $zipName = 'arsiv_' . time() . '.zip';
-    $zipPath = 'uploads/' . $zipName;
+        $zip = new ZipArchive();
+        $zipName = 'arsiv_' . time() . '.zip';
+        $zipPath = 'uploads/' . $zipName;
 
-    if ($zip->open($zipPath, ZipArchive::CREATE) === TRUE) {
-        foreach ($files as $file) {
-            $filePath = realpath($file);
-            if (file_exists($filePath)) {
-                $zip->addFile($filePath, basename($filePath));
+        if ($zip->open($zipPath, ZipArchive::CREATE) === TRUE) {
+            foreach ($files as $file) {
+                $filePath = realpath($file);
+                if (file_exists($filePath)) {
+                    $zip->addFile($filePath, basename($filePath));
+                }
             }
+            $zip->close();
+
+            // İndirme başlat
+            header('Content-Type: application/zip');
+            header('Content-Disposition: attachment; filename="' . basename($zipPath) . '"');
+            header('Content-Length: ' . filesize($zipPath));
+            readfile($zipPath);
+
+            // Geçici ZIP silinsin
+            unlink($zipPath);
+            exit;
+        } else {
+            echo "ZIP oluşturulamadı.";
         }
-        $zip->close();
-
-        // İndirme başlat
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="' . basename($zipPath) . '"');
-        header('Content-Length: ' . filesize($zipPath));
-        readfile($zipPath);
-
-        // Geçici ZIP silinsin istiyorsan:
-        unlink($zipPath);
-        exit;
     } else {
-        echo "ZIP oluşturulamadı.";
+        echo "Hiç dosya seçilmedi.";
     }
-} else {
-    echo "Hiç dosya seçilmedi.";
-}
+} 
 
 // Dosya silme işlemi
 if (isset($_GET['delete_file'])) {
@@ -226,6 +270,66 @@ if (isset($_GET['delete_file'])) {
         color: black;
 
         }       
+        
+  body.dark-mode{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode header{
+    background-color: black;
+    color: rgb(255, 255, 255);
+    border-bottom: 2px solid white;
+  }
+  
+  body.dark-mode .nav-container{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode .nav-container a{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  } 
+  body.dark-mode .nav-container .logo{ 
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode .nav-container .fa-solid{ 
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode main{ 
+    background-color: black;
+  }
+  body.dark-mode footer{ 
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+  } 
+  body.dark-mode footer i { 
+    color: white;
+  } 
+  body.dark-mode footer span{ 
+    color: white;
+  } 
+  body.dark-mode .hero-section{
+    background-color: black;
+  }
+  body.dark-mode   #dark-mode-toggle{
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid white;
+    border-radius: 100%;
+    font-size: 1.3rem;
+    background-color: transparent;
+    cursor: pointer;
+  }
+  #dark-mode-toggle{
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid;
+    border-radius: 100%;
+    font-size: 1.3rem;
+    background-color: transparent;
+    cursor: pointer;
+  }
         .nav-container{ 
             display: flex;
             justify-content: space-around;
@@ -407,36 +511,33 @@ if (isset($_GET['delete_file'])) {
         
             .premium-price.price-card:hover { 
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);  
-            }
-            .premium-price .price-card:hover h4 {
-            color: #fff;  
-            }
+            } 
         
             .price-card:nth-child(1) {
-            background-color: #66bcf1; 
-            }
-        
+            background-color:rgb(255, 255, 255);  
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);  
+            color: black;
+            } 
             .price-card:nth-child(1) ul{    
-                margin-top: 12px;
+                margin-top:  35px;
             }
             .price-card:nth-child(1) button{    
-                margin-top: 22px;
+                margin-top: 10px;
+                background-color: #66bcf1;  
+                color:
             }
-        
             .price-card:nth-child(2) {
-            background-color: #66bcf1;  
+            background-color:rgb(255, 255, 255);  
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);  
+            color: black;
             } 
             .price-card:nth-child(2) ul{    
                 margin-top:  35px;
             }
             .price-card:nth-child(2) button{    
                 margin-top: 10px;
-            }
-
-            .price-card:nth-child(3) {
-            background-color: #66bcf1;  
-            }
+                background-color: #66bcf1;  
+            } 
             
             .price-card:nth-child(3) ul{    
                 margin-top: 23px;
@@ -476,7 +577,10 @@ if (isset($_GET['delete_file'])) {
         z-index: 1001;
         transition: all 0.3s ease;
     }
-
+    .archive-btn{
+        display: flex;
+        margin: 0 auto;
+    }
     </style>
 </head>
 <body>
@@ -490,6 +594,9 @@ if (isset($_GET['delete_file'])) {
            <i class="fas fa-envelope icon"></i>
           İletişim</a></li>
       </ul>
+           <button id="dark-mode-toggle"> 
+         <i class="fa-solid fa-moon"></i>
+      </button>
     </nav>
   </header>
   <main>
@@ -513,7 +620,8 @@ if (isset($_GET['delete_file'])) {
         </form>
 
         <button class="upload-btn" onclick="uploadFile()">Dosya Yükle</button>
-    <form id="filterForm" method="GET" action="upload.php">
+        <?php if ($membership!=='free'):?>
+        <form id="filterForm" method="GET" action="upload.php">
         <h3>Filtreleme</h3>
         <label>Tür (uzantı, örn: txt, pdf):</label>
         <input type="text" name="type" value="<?= htmlspecialchars($_GET['type'] ?? '') ?>">
@@ -527,27 +635,33 @@ if (isset($_GET['delete_file'])) {
         <input type="submit" value="Filtrele">
         <button id="showAllBtn">Hepsini Getir</button>
     </form>
+    <?php endif; ?>
+
 
 
         <div class="file-list">
             <h3>Yüklediğiniz Dosyalar:</h3>
-            <form id="archiveForm" method="POST" action="archive.php">
-            <?php
-            if (count($files) > 0):
-                foreach ($files as $file):
-            ?>
-                <div>
-            <input type="checkbox" name="files[]" value="<?= htmlspecialchars($file['file_path']) ?>">
-             <?= htmlspecialchars($file['file_name']) ?> (<?= $file['file_size'] ?> bayt)        
-             <a href="uploads/<?php echo basename($file['file_path']); ?>" download>İndir</a> | 
-                    <a href="upload.php?delete_file=<?php echo $file['file_id']; ?>" onclick="return confirm('Bu dosyayı silmek istediğinizden emin misiniz?');">Sil</a> | 
-                    <a href="#" onclick="openShareModal('<?php echo addslashes(htmlspecialchars(basename($file['file_path']))); ?>'); return false;">Paylaş</a> 
-                    </div>
-                    <br>
-            <?php endforeach; else: ?>
-                <p>Henüz dosya yüklemediniz.</p>
-            <?php endif; ?>
-            </form>
+          <form id="archiveForm" method="POST" action="archive.php">
+    <?php if (count($files) > 0): ?>
+        <?php foreach ($files as $file): ?>
+            <div>
+                <?php if($membership!=='free'):?>
+                <input type="checkbox" name="files[]" value="<?= htmlspecialchars($file['file_path']) ?>">
+                <?php endif;?>
+                <?= htmlspecialchars($file['file_name']) ?> (<?= $file['file_size'] ?> bayt)          
+                <a href="uploads/<?= basename($file['file_path']) ?>" download>İndir</a> | 
+                <a href="upload.php?delete_file=<?= $file['file_id'] ?>" onclick="return confirm('Bu dosyayı silmek istediğinizden emin misiniz?');">Sil</a> | 
+                <a href="#" onclick="openShareModal('<?= addslashes(htmlspecialchars(basename($file['file_path']))) ?>'); return false;">Paylaş</a> 
+            </div>
+        <?php endforeach; ?>
+        <br>
+        <?php if ($membership!=='free'): ?>
+        <button type="submit" class='archive-btn'>Seçilenleri Arşivle</button>
+        <?php endif; ?>
+    <?php else: ?>
+        <p>Henüz dosya yüklemediniz.</p>
+    <?php endif; ?>
+</form>
 
         </div>
 <!-- Modal -->
@@ -599,9 +713,6 @@ if (isset($_GET['delete_file'])) {
         <button type="button" onclick="closeModal()">İptal</button>
     </form>
 </div>
-<form action="archive.php" method="POST">
-    <button type="submit" class="archive-btn">Seçilenleri Arşivle</button>
-</form>
 
 <form action="upload.php" method="POST">
         <button type="submit" name="logout" class="logout-btn">Çıkış Yap</button>
@@ -617,7 +728,7 @@ if (isset($_GET['delete_file'])) {
   <div class="premium-price">
     <div class="price-card"> 
       <h3 style="font-size: 32px;"> Aylık Üyelik </h3>   
-        <h4 style="font-size: 34px; color: white; width: 100%; height: 30px; ">Fiyat: 59,99 TL</h4> 
+        <h4 style="font-size: 34px; width: 100%; color: black; height: 30px; ">Fiyat: 199,99 TL</h4> 
       <br>
       <ul>
       <li><i class="fa-solid fa-check"></i> 15GB Bulut depolama alanı </li>
@@ -628,14 +739,14 @@ if (isset($_GET['delete_file'])) {
         <li><i class="fa-solid fa-check"></i> Hızlı geri bildirim destek hattı</li>
       </ul>
       <form action="payment.php" method="POST">
-  <input type="hidden" name="membership_type" value="Monthly">
+  <input type="hidden" name="membership_type" value="monthly">
   <button type="submit" class="satin-btn">Şimdi Yükselt</button>
 </form>
     </div>
 
     <div class="price-card"> 
       <h3 style="font-size: 32px;"> Yıllık Üyelik </h3>    
-      <h4 style="font-size: 34px; color: white; width: 100%; height: 30px; ">Fiyat: 499,99 TL</h4>
+      <h4 style="font-size: 34px; color: black; width: 100%; height: 30px; ">Fiyat: 499,99 TL</h4>
       <ul>
       <li><i class="fa-solid fa-check"></i> 1TB Bulut depolama alanı </li>  
         <li><i class="fa-solid fa-check"></i> 5 GB'a kadar tek dosya yükleme</li>
@@ -646,7 +757,7 @@ if (isset($_GET['delete_file'])) {
         <li><i class="fa-solid fa-check"></i> Reklamsız şekilde dosya yükleme ve paylaşım</li> 
       </ul>
       <form action="payment.php" method="POST">
-  <input type="hidden" name="membership_type" value="Yearly">
+  <input type="hidden" name="membership_type" value="yearly">
   <button type="submit" class="satin-btn">Şimdi Yükselt</button>
 </form>
     </div>
@@ -850,6 +961,9 @@ document.getElementById("showAllBtn").addEventListener("click",  (e) => {
     window.location.href = "upload.php";
 });
 
+document.getElementById('dark-mode-toggle').addEventListener('click',()=>{
+  document.body.classList.toggle('dark-mode');
+});
 
     </script>
 </body>

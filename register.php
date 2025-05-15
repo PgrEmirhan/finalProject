@@ -41,7 +41,6 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
         exit();
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -60,6 +59,93 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
       overflow-x: hidden;
       color: black;
     } 
+      body.dark-mode{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode header{
+    background-color: black;
+    color: rgb(255, 255, 255);
+    border-bottom: 2px solid white;
+  }
+  
+  body.dark-mode .nav-container{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode .nav-container a{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  } 
+  body.dark-mode .nav-container .logo{ 
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode .nav-container .fa-solid{ 
+    color: rgb(255, 255, 255);
+  } 
+  body.dark-mode footer{ 
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+  } 
+  body.dark-mode footer i { 
+    color: white;
+  } 
+  body.dark-mode .card { 
+    background-color: gray;
+    color: white;
+  } 
+  body.dark-mode footer span{ 
+    color: white;
+  }  
+  body.dark-mode .slogan h1 { 
+    color: white;
+  } 
+  body.dark-mode .slogan #word{ 
+    color: white;
+  }  
+  body.dark-mode   #dark-mode-toggle{
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid white;
+    border-radius: 100%;
+    font-size: 1.3rem;
+    background-color: transparent;
+    cursor: pointer;
+  }
+  body.dark-mode .premium-price .price-card{
+    background: linear-gradient(154deg, gray, black);    
+    color: white;
+    border: 1px solid white;
+  }
+  body.dark-mode .premium-price .price-card ul li{ 
+    color: white; 
+
+  }
+  body.dark-mode i{ 
+    color: white; 
+
+  }
+  
+  body.dark-mode .premium-price .price-card:nth-child(2) h4{ 
+    color: white; 
+  }
+  body.dark-mode .premium-price .price-card:nth-child(2) button{ 
+    color: white; 
+    background-color:rgb(0, 0, 0);
+
+  }
+  
+  #dark-mode-toggle{
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid;
+    border-radius: 100%;
+    font-size: 1.3rem;
+    background-color: transparent;
+    cursor: pointer;
+  }
+
     .hesaplar{
         margin: 0 auto;
         display: flex;
@@ -129,6 +215,7 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
     outline: none;
     border: none;
     border-bottom: 2px solid rgb(211, 211, 211); 
+          border-radius: 5px;
    }
     form #kayit-btn{
 
@@ -235,6 +322,9 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
            <i class="fas fa-envelope icon"></i>
           İletişim</a></li>
       </ul>
+                 <button id="dark-mode-toggle"> 
+         <i class="fa-solid fa-moon"></i>
+      </button>
     </nav>  
   </header>
   <main>    
@@ -248,7 +338,7 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
         <i class="fa-solid fa-envelope"></i>
        </div>     
         <div class="pword-icon">
-          <input type="password" name="password" id="pword"placeholder="parolanız..." style="width: 100%;"  pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+          <input type="password" name="password" id="pword"placeholder="parolanız..." style="width: 100%;"pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
          title="Parola en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir."
          required> 
           <i class="fa-solid fa-eye-slash" id="togglePassword"></i>
@@ -307,6 +397,9 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
         this.classList.toggle("fa-eye");
         this.classList.toggle("fa-eye-slash");
     });
+    document.getElementById('dark-mode-toggle').addEventListener('click',()=>{
+  document.body.classList.toggle('dark-mode');
+}); 
 </script>
   </body>
 </html>

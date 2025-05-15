@@ -80,7 +80,7 @@ if (!$file) {
 $filePath = $file['file_path'];
 $fileName = $file['file_name'];
 
-if (!file_exists($filePath)) {
+if (!file_exists($filePath)) {  
     die("Dosya sunucuda bulunamadı.");
 }
 

@@ -21,7 +21,7 @@
         $fileError = $_FILES['file']['error'];
         $fileSize = $_FILES['file']['size'];
         $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'txt', 'docx', 'zip'];
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'txt', 'docx', 'zip','html'];
 
         // Dosya hatası yoksa, yükleme işlemini başlat
         if ($fileError === 0) {
@@ -114,11 +114,9 @@
         echo "Veritabanı hatası: " . $e->getMessage();
     }
 
-    ?>
+    ?> 
 
-
-
-        <!DOCTYPE html>
+    <!DOCTYPE html>
         <html lang="en">
         <head>
         <meta charset="UTF-8">
@@ -147,7 +145,89 @@
                 margin-right: 10px;
                 text-decoration: none;
                 color: #4CAF50;
-            }   
+            }      
+  body.dark-mode{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode header{
+    background-color: black;
+    color: rgb(255, 255, 255);
+    border-bottom: 2px solid white;
+  }
+  
+  body.dark-mode .nav-container{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode .nav-container a{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  } 
+  body.dark-mode .nav-container .logo{ 
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode .nav-container .fa-solid{ 
+    color: rgb(255, 255, 255);
+  } 
+  body.dark-mode footer{ 
+    background-color: black;
+    color: white;
+    border: 1px solid white;
+  } 
+  body.dark-mode footer i { 
+    color: white;
+  } 
+  body.dark-mode .card { 
+    background-color: gray;
+    color: white;
+  } 
+  body.dark-mode footer span{ 
+    color: white;
+  }  
+  body.dark-mode .slogan h1 { 
+    color: white;
+  } 
+  body.dark-mode .slogan #word{ 
+    color: white;
+  }  
+  body.dark-mode   #dark-mode-toggle{
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid white;
+    border-radius: 100%;
+    font-size: 1.3rem;
+    background-color: transparent;
+    cursor: pointer;
+  }
+  body.dark-mode .premium-price .price-card{
+    background: linear-gradient(154deg, gray, black);    
+    color: white;
+    border: 1px solid white;
+  }
+  body.dark-mode .premium-price .price-card ul li{ 
+    color: white; 
+
+  }
+  
+  body.dark-mode .premium-price .price-card:nth-child(2) h4{ 
+    color: white; 
+  }
+  body.dark-mode .premium-price .price-card:nth-child(2) button{ 
+    color: white; 
+    background-color:rgb(0, 0, 0);
+
+  }
+  
+  #dark-mode-toggle{
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid;
+    border-radius: 100%;
+    font-size: 1.3rem;
+    background-color: transparent;
+    cursor: pointer;
+  }
             .nav-container{ 
             display: flex;
             justify-content: space-around;
@@ -272,7 +352,7 @@
         margin-bottom: 15px;
         cursor: pointer;
         }  
-        .satin-btn{ 
+        .uyelik-btn{ 
         border: none;
         padding: 15px 45px;
         background-color: lightgoldenrodyellow;
@@ -318,26 +398,28 @@
     
         .premium-price.price-card:hover { 
         box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);  
-        }
-        .premium-price .price-card:hover h4 {
-        color: #fff;  
-        }
-    
+        } 
         .price-card:nth-child(1) {
-        background-color: #66bcf1; 
-        }
+        background-color:rgb(255, 255, 255);  
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);  
+        color: black;        }
     
         .price-card:nth-child(1) ul{    
             margin-top: 32px;
         }
         .price-card:nth-child(1) button{    
             margin-top: 62px;
+                        background-color: #66bcf1;
+            color: white;
         }
     
         .price-card:nth-child(2) {
         background-color:rgb(255, 255, 255);  
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);  
         color: black;
+        } 
+        .price-card:nth-child(2) h4 {   
+        color: black; 
         } 
         .price-card:nth-child(2) ul{    
             margin-top:  0px;
@@ -349,16 +431,22 @@
         }
 
         .price-card:nth-child(3) {
-        background-color: #66bcf1;  
-        }
+        background-color:rgb(255, 255, 255);  
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);  
+        color: black;        }
+
+        .price-card:nth-child(3) h3{ 
+        color: black;        }
         
         .price-card:nth-child(3) ul{    
             margin-top: 33px;
             margin-bottom: 10px;
         }
         .price-card:nth-child(3) button{    
-            margin-top: 10px;
+            margin-top: 39px;
             margin-bottom: 5px; 
+                        background-color: #66bcf1;
+            color: white;
         }
 
             .premium-container h2{
@@ -451,13 +539,15 @@
                 <li><a href="contact.php">         
                 <i class="fa-solid fa-envelope"></i>
                 İletişim</a></li>
-            </ul>
+            </ul>           <button id="dark-mode-toggle"> 
+         <i class="fa-solid fa-moon"></i>
+      </button>
             </nav> 
         </header>
         <main>  
         <div align="center" class="slogan">
             <h1 style="font-size: 36px;">DOSYALARINIZI GÜVENLE <span id="word"></span></h1>
-
+        </div>
                 <div class="guest_upload">
                 <h2>İlk Dosyanızı Yükleyin!</h2>
                 <img src="images/file-upload.png" width="240">
@@ -473,7 +563,7 @@
                 </div>
                 <br>
 
-                <form id="uploadForm" action="guest_upload.php" method="POST" enctype="multipart/form-data" style="display:none;">
+                <form id="uploadForm" action="index.php" method="POST" enctype="multipart/form-data" style="display:none;">
                     <input type="file" name="file" id="fileInput" />
                 </form>
 
@@ -564,51 +654,49 @@
     <div class="price-card">
       
       <h3 style="font-size: 32px;"> Temel Üyelik </h3>   
-      <h4 style="font-size: 34px; color: white; width: 100%; height: 30px; ">Fiyat: 0,00 TL</h4> 
+      <h4 style="font-size: 34px; color: black; width: 100%; height: 30px; ">Fiyat: 0,00 TL</h4> 
       <ul>
         <li><i class="fa-solid fa-check"></i> 5GB Bulut depolama alanı </li>
         <li><i class="fa-solid fa-check"></i> Reklamsız ve hızlı kullanım deneyimi </li>
-        <li><i class="fa-solid fa-check"></i> 5 GB’a kadar dosya yükleme limiti </li>
+        <li><i class="fa-solid fa-check"></i> 10 MB’a kadar dosya yükleme limiti </li>
         <li><i class="fa-solid fa-check"></i> Yüksek öncelikli dosya indirme </li>
         <li><i class="fa-solid fa-check"></i> Temel dosya gizlilik ayarları </li>
         <li><i class="fa-solid fa-check"></i> E-posta üzerinden destek </li>
       </ul>
       <input type="hidden" name="membership_type" value="free">
-      <a href="register.php"><button class="satin-btn">Kayıt Ol</button></a>
-
-      
+      <a href="register.php"><button class="uyelik-btn">Kayıt Ol</button></a> 
     </div>
     <div class="price-card"> 
       <h3 style="font-size: 32px;"> Aylık Üyelik </h3>   
-        <h4 style="font-size: 34px; color: black; width: 100%; height: 30px; ">Fiyat: 59,99 TL</h4> 
+        <h4 style="font-size: 34px; width: 100%; height: 30px; ">Fiyat: 199,99 TL</h4> 
       <br>
       <ul>
-        <li><i class="fa-solid fa-check"></i> 15GB Bulut depolama alanı</li>
+        <li><i class="fa-solid fa-check"></i> 15GB Bulut depolama alanı </li>
         <li><i class="fa-solid fa-check"></i> Gelişmiş dosya arşivleme ve filtreleme</li>
-        <li><i class="fa-solid fa-check"></i> 10 GB'a kadar tek dosya yükleme</li>
+        <li><i class="fa-solid fa-check"></i> 1 GB'a kadar tek dosya yükleme</li>
         <li><i class="fa-solid fa-check"></i> Erişim limiti ayarlama</li>
         <li><i class="fa-solid fa-check"></i> Şifreli paylaşım bağlantıları oluşturma</li>
         <li><i class="fa-solid fa-check"></i> Hızlı geri bildirim destek hattı</li>
       </ul>
       <input type="hidden" name="membership_type" value="Monthly">
-      <a href="register.php"><button class="satin-btn">Şimdi Geçiş Yap</button></a>
+      <a href="register.php"><button class="uyelik-btn">Şimdi Geçiş Yap</button></a>
     </div>
 
     <div class="price-card"> 
       <h3 style="font-size: 32px;"> Yıllık Üyelik </h3>    
-      <h4 style="font-size: 34px; color: white; width: 100%; height: 30px; ">Fiyat: 499,99 TL</h4>
+      <h4 style="font-size: 34px; color: black; width: 100%; height: 30px; ">Fiyat: 499,99 TL</h4>
       <ul>
-        <li><i class="fa-solid fa-check"></i> 1TB Bulut depolama alanı</li>  
+        <li><i class="fa-solid fa-check"></i> 1TB Bulut depolama alanı </li>  
+        <li><i class="fa-solid fa-check"></i> 5 GB'a kadar tek dosya yükleme</li>
         <li><i class="fa-solid fa-check"></i> Gelişmiş dosya arşivleme ve filtreleme</li>
         <li><i class="fa-solid fa-check"></i> Sınırsız dosya yükleme ve paylaşım hakkı</li>
         <li><i class="fa-solid fa-check"></i> Link süresi ve erişim limiti ayarlama</li>
         <li><i class="fa-solid fa-check"></i> Şifreli paylaşım bağlantıları oluşturma</li>
-        <li><i class="fa-solid fa-check"></i> Reklamsız şekilde dosya yükleme ve paylaşım</li>
-        <li><i class="fa-solid fa-check"></i> Özel anında canlı destek ve öncelik sırası</li>
+        <li><i class="fa-solid fa-check"></i> Reklamsız şekilde dosya yükleme ve paylaşım</li> 
       </ul>
       <form action="payment.php" method="POST">
       <input type="hidden" name="membership_type" value="Yearly">
-      <button type="submit" class="satin-btn">Şimdi Geçiş Yap</button>
+      <button type="submit" class="uyelik-btn">Şimdi Geçiş Yap</button>
     </form>
     </div>
 
@@ -650,7 +738,7 @@
             <a href="#"><h3>İLETİŞİM BİLGİLERİ </h3></a>
             <li><a href=""><b>Telefon: </b> +90 123 456 789
             </a></li>
-            <li><a href=""><b>Email: </b>support@dosyapaylasim.com
+            <li><a href=""><b>Email: </b>tefsharingt@gmail.com
             </a></li> 
             </ul>
         </div> 
@@ -751,7 +839,10 @@
             };
             xhr.send();
         }
-    }
+    } document.getElementById('dark-mode-toggle').addEventListener('click',()=>{
+  document.body.classList.toggle('dark-mode');
+});
+
         </script>
         </body>
         </html>

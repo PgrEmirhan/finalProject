@@ -281,6 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_type'])) {
 <main>
   <div id="payment-wrapper">
     <h2><i class="fa-solid fa-credit-card"></i> ÖDEME SAYFASI <i class="fa-solid fa-credit-card"></i></h2>
+    
     <div id="payment-content">
       <div class="payment-image">
         <img src="images/payment.png" alt="">
@@ -327,7 +328,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_type'])) {
         </div>
 
         <form class="form-container" action="confirm.php" method="POST">
-          <input type="hidden" name="card_type" id="card-type" value="visa">
+          <input type="hidden" name="card_type" id="card-type" value="visa"><!--
+          <input type="hidden" name="card_type" id="card-type" value="mastercard">
+          <input type="hidden" name="card_type" id="card-type" value="truy">!-->
+            <input type="hidden" name="membership_type" value="<?php echo htmlspecialchars($_POST['membership_type'] ?? ''); ?>">
 
           <label>Kart Numarası</label>
           <input type="text" name="card_number" maxlength="19" oninput="updateCard(this, 'card-number')" placeholder="1234 5678 9012 3456" required>

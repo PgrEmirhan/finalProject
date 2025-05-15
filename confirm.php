@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Veritabanı bağlantısı
 $host = 'localhost'; 
 $dbname = 'file_sharing'; 
 $username = 'root'; 
@@ -14,35 +13,15 @@ try {
     die("Veritabanı bağlantısı başarısız: " . $e->getMessage());
 }
 
-// Kullanıcı giriş yaptıysa ID'si
 $user_id = $_SESSION['user_id'] ?? null;
 
 if (!$user_id) {
     die("Kullanıcı oturumu bulunamadı.");
 }
 
-// Formdan gelen kart tipi
-$card_type = $_POST['card_type'] ?? '';
+// upload.php'den gelen üyelik bilgisi
+$membership_type = $_POST['membership_type'] ?? 'free';
 
-// Kart tipine göre üyelik tipi belirle
-$membership_type = '';
-
-switch ($card_type) {
-    case 'visa':
-        $membership_type = 'Aylık';
-        break;
-    case 'mastercard':
-        $membership_type = 'Yıllık';
-        break;
-    case 'troy':
-        $membership_type = 'Free';
-        break;
-    default:
-        $membership_type = 'Free';
-        break;
-}
-
-// Veritabanında kullanıcıya ait üyeliği güncelle
 try {
     $stmt = $pdo->prepare("UPDATE users SET membership_type = :membership_type WHERE user_id = :user_id");
     $stmt->execute([
@@ -56,6 +35,7 @@ try {
 } catch (PDOException $e) {
     echo "Hata oluştu: " . $e->getMessage();
 }
+ 
 ?>
 
 
