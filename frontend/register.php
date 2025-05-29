@@ -1,0 +1,154 @@
+<?php
+session_start();
+
+require 'connect.php';
+
+if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['email'])) {
+    $input_username = $_POST['username'];
+    $input_password = $_POST['password'];
+    $input_email = $_POST['email'];
+ 
+    if (!filter_var($input_email, FILTER_VALIDATE_EMAIL)) {
+        echo "Geçersiz e-posta adresi!";
+        exit();
+    }
+ 
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE user_name = ? OR email = ?");
+    $stmt->execute([$input_username, $input_email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user) {
+        echo "Bu kullanıcı adı ya da e posta zaten alınmış!";
+    } else { 
+        $hashed_password = password_hash($input_password, PASSWORD_DEFAULT);
+ 
+        $is_guest = 0;
+ 
+        $stmt = $pdo->prepare("INSERT INTO users (user_name, user_password, email, is_guest) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$input_username, $hashed_password, $input_email, $is_guest]);
+ 
+        header("Location: login.php");
+        exit();
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/register.css">
+</head>
+<body>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <header>
+    <nav class="nav-container">
+      <a href="index.php"><img src="images/logo.png" alt="" style="width: 80px; margin-left: 5px;"></a>
+      <ul>
+        <li><a href="login.php">           
+           <i class="fas fa-sign-in-alt icon"></i>
+          Giriş Yap</a></li> 
+        <li><a href="contact.php">   
+           <i class="fas fa-envelope icon"></i>
+          İletişim</a></li>
+      </ul>
+                 <button id="dark-mode-toggle"> 
+         <i class="fa-solid fa-moon"></i>
+      </button>
+    </nav>  
+  </header>
+  <main>    
+    <div class="container">
+      <h3 align="center" style="font-size: 32px;">Kayıt Ol</h3>
+      <form action="" method="post"> 
+        <div class="kadi-icon">
+      <input type="text" name="username" id="kadi" placeholder="kullanıcı adınız..." style="width: 100%;" required> <i class="fa-solid fa-user"></i></div>
+       <div class="email-icon"> 
+        <input type="email" name="email" id="email" placeholder="mail adresiniz..." style="width: 100%;" required>
+        <i class="fa-solid fa-envelope"></i>
+       </div>     
+        <div class="pword-icon">
+          <input type="password" name="password" id="pword"placeholder="parolanız..." style="width: 100%;" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+         title="Parola en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir."
+         required> 
+          <i class="fa-solid fa-eye-slash" id="togglePassword"></i>
+          </div>
+          <input type="submit" value="Kayıt Ol" id="kayit-btn">
+          <p align="center">Zaten hesabım var. <a href="login.php">Giriş yap</a> Ya da</p>
+        </form>
+        
+        <p align="center">Farklı bir hesapla giriş yap</p>
+        <div class="hesaplar">
+        <a href="google-login.php"><i class="fa-brands fa-google"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+        <a href="#"><i class="fa-brands fa-github"></i></a>
+        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+        </div>
+    </div>
+  </main>
+  <footer>  
+    <div class="footer-nav"> 
+        <ul>
+        <a href="#"><h3>HIZLI BAĞLANTILAR</h3></a>
+        <li><a href="index.php">Anasayfa</a></li> 
+        <li><a href="register.php">Üye ol</a></li>  
+        <li><a href="contact.php">İletişim</a></li>
+        </ul>
+        <ul>
+        <a href="#"><h3>YASAL BİLGİLER</h3></a>
+        <li><a href="">Kullanım Koşulları </a></li>
+        <li><a href="">Gizlilik Politikası </a></li>
+        <li><a href="">Çerez Politikası</a></li> 
+        </ul>
+        <ul>
+        <a href="#"><h3>SOSYAL MEDYA</h3></a>
+        <li><a href="">Facebook </a></li>
+        <li><a href="">Twitter</a></li>
+        <li><a href="">Instagram</a></li> 
+        </ul>
+        <ul>
+        <a href="#"><h3>İLETİŞİM BİLGİLERİ </h3></a>
+        <li><a href=""><b>Telefon: </b> +90 123 456 789
+        </a></li>
+        <li><a href=""><b>Email: </b>support@dosyapaylasim.com
+        </a></li> 
+        </ul>
+    </div> 
+        <p align="center">Tüm haklar saklıdır. TE-FS &copy2025</p>
+    </footer>
+    <script>
+    const togglePassword = document.getElementById("togglePassword");
+    const passwordField = document.getElementById("pword");
+
+    togglePassword.addEventListener("click", function () {
+        const type = passwordField.type === "password" ? "text" : "password";
+        passwordField.type = type;
+        this.classList.toggle("fa-eye");
+        this.classList.toggle("fa-eye-slash");
+    });
+ // Sayfa yüklendiğinde localStorage'dan dark mode'u kontrol et
+window.addEventListener('DOMContentLoaded', () => {
+  const isDarkMode = localStorage.getItem('darkMode');
+  if (isDarkMode === 'enabled') {
+    document.body.classList.add('dark-mode');
+  }
+});
+
+// Butona tıklanınca dark mode aç/kapat
+document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled'); // aktif halde sakla
+  } else {
+    localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
+  }
+});
+</script>
+  </body>
+</html>
