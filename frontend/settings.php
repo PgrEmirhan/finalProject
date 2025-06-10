@@ -1,6 +1,6 @@
 <?php
-require 'connect.php';
 require 'auth.php';
+require 'connect.php';
 
 $id = $_SESSION['user_id'];
 
@@ -39,18 +39,18 @@ $user = $stmt->fetch();
 <!-- NAV -->
 <nav class="nav-container">
   <a href="index.php">
-    <img src="images/logo.png" alt="Logo" style="width: 80px; margin-right: 111px;">
+    <img src="images/logo.png" alt="Logo" style="width: 80px; margin-right: 111px;" id="logo">
   </a>
 
   <!-- Normal Menü (büyük ekran) -->
   <ul class="nav-links">
     <li><a href="contact.php"><i class="fas fa-envelope icon"></i> İletişim</a></li>
-      <button id="dark-mode-toggle">
+
+  </ul>
+       <button id="dark-mode-toggle">
     <i class="fa-solid fa-moon"></i>
   </button>
 
-  </ul>
- 
 
   <!-- Avatar Butonu -->
   <button id="avatarBtn">
@@ -81,6 +81,11 @@ $user = $stmt->fetch();
       <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li>  
       <li><a href="archive.php"><i class="fa-solid fa-box"></i> Arşivlerim</a></li>
       <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a></li>
+            <li>
+        <button id="dark-mode-toggle">
+        <i class="fa-solid fa-moon"></i>
+        </button> 
+      </li>
     </ul>
   </div>
 </div> 
@@ -88,7 +93,6 @@ $user = $stmt->fetch();
 <main class="settings-page">
 
   <form action="settings_save.php" method="POST" class="setting-card">
-  
     <div class="title-box"><i class="fa-solid fa-lock"></i> <h3> Gizlilik Ayarları</h3></div>
     <label>
       <input type="checkbox" name="is_profile_public" <?= $user['is_profile_public'] ? 'checked' : '' ?>>
@@ -104,13 +108,19 @@ $user = $stmt->fetch();
   <form action="change_password.php" method="POST" class="setting-card">
     <div class="title-box"><i class="fa-solid fa-key"></i> Şifre Değiştir</div>
     <label>Eski Şifreniz:
-      <input type="password" name="old_password" required>
+      <input type="password" name="old_password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+         title="Parola en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir."
+         required>
     </label><br>
     <label>Yeni Şifreniz:
-      <input type="password" name="new_password" required>
+      <input type="password" name="new_password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+         title="Parola en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir."
+         required>
     </label><br>
     <label>Yeni Şifre (Tekrar):
-      <input type="password" name="confirm_password" required>
+      <input type="password" name="confirm_password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+         title="Parola en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir."
+         required>
     </label><br>
     <button type="submit">Şifreyi Güncelle</button>
   </form>
@@ -171,20 +181,33 @@ $user = $stmt->fetch();
     </footer> 
 
   <script>
-  window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => {
   const isDarkMode = localStorage.getItem('darkMode');
   if (isDarkMode === 'enabled') {
     document.body.classList.add('dark-mode');
-  }// Butona tıklanınca dark mode aç/kapat
+  }
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
+});
+
+function updateLogo() {
+  const logo = document.getElementById('logo');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  if (logo) {
+    logo.src = isDarkMode ? 'images/logo2.png' : 'images/logo.png';
+  }
+}
+
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
 document.getElementById('dark-mode-toggle').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
+  updateLogo();
 
   if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('darkMode', 'enabled'); // aktif halde sakla
+    localStorage.setItem('darkMode', 'enabled');
   } else {
-    localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
+    localStorage.setItem('darkMode', 'disabled');
   }
-}); 
+});
 
       // Avatar dropdown
   const avatarBtn = document.getElementById('avatarBtn');
@@ -208,7 +231,6 @@ document.getElementById('membership-select').addEventListener('change', function
     document.getElementById('profile-form').submit();
   }
 });  
-});
       // Hamburger popup
   // Hamburger popup
   function openPopup() {

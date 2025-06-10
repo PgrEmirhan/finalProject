@@ -40,6 +40,15 @@
     background-color: gray;
     color: white;
   } 
+  body.dark-mode .popup-menu a{  
+  text-decoration: none;
+  color: #333;
+  font-size: 18px;
+  font-weight: bold;
+  } 
+
+
+
   body.dark-mode footer span{ 
     color: white;
   }  
@@ -49,15 +58,26 @@
   body.dark-mode .slogan #word{ 
     color: white;
   }  
-  body.dark-mode   #dark-mode-toggle{
-    width: 2rem;
-    height: 2rem;
-    border: 1px solid white;
-    border-radius: 100%;
-    font-size: 1.3rem;
-    background-color: transparent;
-    cursor: pointer;
-  }
+body.dark-mode   #dark-mode-toggle-desktop{
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid white;
+  border-radius: 100%;
+  font-size: 1.3rem;
+  background-color: transparent;
+  cursor: pointer;
+  margin-right: 10px;
+}
+body.dark-mode   #dark-mode-toggle-mobile{
+  width: 2rem;
+  height: 2rem;
+  color: white;
+  background-color: black;
+  border: 2px solid rgb(0, 0, 0);
+  border-radius: 100%;
+  font-size: 1.3rem; 
+  cursor: pointer;
+}
   body.dark-mode .premium-price .price-card{
     background: linear-gradient(154deg, gray, black);    
     color: white;
@@ -66,11 +86,7 @@
   body.dark-mode .premium-price .price-card ul li{ 
     color: white; 
 
-  }
-  body.dark-mode i{ 
-    color: white; 
-
-  }
+  } 
   
   body.dark-mode .premium-price .price-card:nth-child(2) h4{ 
     color: white; 
@@ -81,15 +97,34 @@
 
   }
   
-  #dark-mode-toggle{
-    width: 2rem;
-    height: 2rem;
-    border: 1px solid;
-    border-radius: 100%;
-    font-size: 1.3rem;
-    background-color: transparent;
-    cursor: pointer;
+  body.dark-mode .dropdown a {
+  color: #ffffff;
+  padding: 10px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body.dark-mode .dropdown a:hover {
+  background-color: #7c7c7c;
+}
+body.dark-mode .hamburger {
+  color: white;
+}
+
+#dark-mode-toggle-desktop, 
+#dark-mode-toggle-mobile{
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
+  border-radius: 100%;
+  font-size: 1.3rem;
+  background-color: rgb(255, 255, 255);
+  cursor: pointer;
   }
+/* GENEL NAV STİLLERİ */
   .hesaplar{
     margin: 0 auto;
     display: flex;
@@ -100,16 +135,36 @@
     font-size: 24px;
     font-weight: bold;  
   }
-  .hesaplar i{
-    color: black;
-    margin: 10px;
-  }
-  .nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; 
-    position: relative;
-  }
+    .nav-container{ 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgb(255, 255, 255);
+      color: white;
+      width: 100%; 
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      top: 0;
+      left: 0;    
+      position: fixed;
+      z-index: 1;
+      border-bottom: 2px solid black;  
+    }
+    .nav-container ul{
+      margin-left: 900px;
+      list-style-type: none; 
+      display:flex;
+      gap: 15px; 
+      
+   }
+    .nav-container ul a{ 
+      text-decoration: none;
+      color: rgb(0, 0, 0); 
+      padding: 10px; 
+      font-size: 18px;
+      transition: all 0.7s;
+      background-color: rgb(255, 255, 255);
+ 
+   }  
 
   .nav-links {
     display: flex;
@@ -129,90 +184,94 @@
     cursor: pointer;
   }
 
-  .avatar-mini {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
+    .user-menu {
+  position: relative;
+  display: inline-block;
+}
 
-  .dropdown {
-    display: none;
-    position: absolute;
-    top: 60px;
-    right: 10px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding: 10px;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
+.avatar-mini {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+  cursor: pointer;
+}
 
-  .dropdown a {
-    display: block;
-    text-decoration: none;
-    padding: 8px;
-    color: #333;
-  }
+.user-menu button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  z-index: 999;
+  border-radius: 8px;
+  padding: 8px 0;
+}
 
-  .dropdown a:hover {
-    background: #f0f0f0;
-  }
+.dropdown a {
+  color: #333;
+  padding: 10px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
+.dropdown a:hover {
+  background-color: #f2f2f2;
+}
   .hamburger {
     display: none;
     font-size: 26px;
     cursor: pointer;
   }
+ 
 
-  /* Mobil Popup */
-  .popup-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 999;
-    justify-content: center;
-    align-items: center;
-  }
+/* POPUP MENÜ */
+.popup-menu {
+  background-color: white;
+  padding: 10px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  animation: fadeIn 0.3s ease-in-out;
+  margin-top: 250px;
+  margin-left: 95px;
+}
 
-  .popup-menu {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    width: 80%;
-    max-width: 300px;
-    position: relative;
-  }
+.popup-menu ul {
+  list-style: none;
+  padding: 0;
+}
 
-  .popup-menu ul {
-    list-style: none;
-    padding: 0;
-  }
+.popup-menu li {
+  margin: 20px 0;
+  text-align: center;
+}
 
-  .popup-menu ul li {
-    margin: 15px 0;
-  }
+.popup-menu a {
+  text-decoration: none;
+  color: #333;
+  font-size: 18px;
+  font-weight: bold;
+}
 
-  .popup-menu ul li a {
-    text-decoration: none;
-    color: #333;
-    font-size: 18px;
-  }
-
-  .close-btn {
+   .close-btn {
     position: absolute;
     top: 10px;
     right: 15px;
     font-size: 22px;
     cursor: pointer;
-  } 
-  .container{ 
-    padding: 50px;
-    margin-top: 50px;
-  }
+  }  
   main{
     display: flex;
     margin: auto 0;
@@ -222,6 +281,10 @@
   }
   .container{ 
     width: 35%;
+    padding: 0 50px; 
+    box-shadow: 0 0px 10px rgb(124, 124, 124);  
+    border-radius: 35px;
+    margin-top: 70px;
   }
   form{      
     display: flex;
@@ -233,7 +296,7 @@
     padding: 10px;
     outline: none;
       border-radius: 5px; 
-      border: none; 
+      border: 1px solid black; 
   }
   form #gonder-btn{
     background: linear-gradient(450deg, rgb(248, 170, 170),rgb(184, 184, 243),rgb(180, 214, 180));
@@ -241,7 +304,7 @@
     width: 100.5%;
     padding: 10px;
     outline: none;
-    border: 1px solid rgb(211, 211, 211);
+    border: 1px solid rgb(0, 0, 0);
     border-radius: 5px;
     font-weight: bolder;
     font-size: 18px;
@@ -300,7 +363,9 @@
     color: rgb(7, 7, 255);
     text-decoration: underline;
   }
-
+#logo{
+  margin-left: 15px;
+}
   footer {
     background-color: black;
     color: white;
@@ -310,7 +375,7 @@
     bottom: auto;  
     left: 0;
     right: 0;  
-    text-align: center; 
+    text-align: center;  
   }
 
   footer a{
@@ -332,7 +397,7 @@
     font-size: 15px;
     font-family: 'Inter', sans-serif;
     outline: none;
-    border: none;
+      border: 1px solid black; 
      border-radius: 5px;
   }
   textarea::placeholder{  
@@ -354,7 +419,7 @@
 .popup-overlay {
   position: fixed;
   top: 0;
-  left: 0;
+  left: 0px;
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.6);
@@ -364,32 +429,6 @@
   z-index: 1000;
 }
 
-/* POPUP MENÜ */
-.popup-menu {
-  background-color: white;
-  padding: 10px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 400px;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.popup-menu ul {
-  list-style: none;
-  padding: 0;
-}
-
-.popup-menu li {
-  margin: 20px 0;
-  text-align: center;
-}
-
-.popup-menu a {
-  text-decoration: none;
-  color: #333;
-  font-size: 18px;
-  font-weight: bold;
-}
 
 .close-btn {
   font-size: 24px;
@@ -412,7 +451,11 @@
   }
     .nav-container ul {
     display: none; 
+  }   
+   #dark-mode-toggle-desktop{
+    display: none; 
   }
+
   .container{
     margin-left: 55px;
     box-shadow: none;
@@ -427,8 +470,7 @@
    }
   .hamburger {
     display: block;
-    margin-right: 15px;
-    color: white;
+    margin-right: 15px; 
   }
 
   /* .cards flex yapısını sütun haline getir */
@@ -514,8 +556,5 @@
     position: relative; 
     align-items: center;
     margin-top: 80px;
-  } 
-  i{
-    color: #000;
-  } 
+  }  
 }

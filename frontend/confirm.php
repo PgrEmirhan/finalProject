@@ -11,7 +11,7 @@ if (!$user_id) {
 
 // upload.php'den gelen üyelik bilgisi
 $membership_type = $_POST['membership_type'] ?? 'free';
-
+ 
 try {
     $stmt = $pdo->prepare("UPDATE users SET membership_type = ? WHERE user_id = ?");
     $stmt->execute([

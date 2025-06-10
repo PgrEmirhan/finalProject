@@ -93,12 +93,12 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <!-- Normal Menü (büyük ekran) -->
   <ul class="nav-links">
     <li><a href="contact.php"><i class="fas fa-envelope icon"></i> İletişim</a></li>
-      <button id="dark-mode-toggle">
+
+  </ul>
+       <button id="dark-mode-toggle">
     <i class="fa-solid fa-moon"></i>
   </button>
 
-  </ul>
- 
 
   <!-- Avatar Butonu -->
   <button id="avatarBtn">
@@ -112,7 +112,7 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <!-- Dropdown Menü (masaüstü) -->
   <div class="dropdown" id="dropdownMenu">  
     <a href="profile.php"><i class="fa-solid fa-user"></i> Profilim</a>
-      <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a></li>
+      <a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a>
     <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a>
   </div>
 
@@ -129,15 +129,20 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li>  
       <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a></li>
       <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a></li>
+        <li>
+        <button id="dark-mode-toggle">
+        <i class="fa-solid fa-moon"></i>
+        </button> 
+      </li>
     </ul>
   </div>
 </div> 
     </nav>
   </header>
   <main>
-    <h2>📦 Arşivlenen Dosyalar</h2>
     <div class="file-list">
-            
+    <h2 align="center">📦 Arşivlenen Dosyalar</h2>
+
     <?php if (empty($files)): ?>
         <p>Hiç arşivlenmiş dosyanız yok.</p>
     <?php else: ?>
@@ -160,7 +165,7 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </ul>
     <?php endif; ?>   
     
-    <a href="upload.php">Yükleme sayfasına dön</a>
+    <a href="upload.php" id="back-upload">Yükleme sayfasına dön</a>
 
     </div>
 

@@ -1,10 +1,10 @@
 <?php
-session_start();
+session_start(); 
 
 require 'connect.php';
 // Token varsa URL'den al
-if (isset($_GET['token'])) {
-    $token = $_GET['token'];
+if (isset($_POST['token'])) {
+    $token = $_POST['token'];
 
     // Bu token'la kullanıcıyı veritabanında ara
     $stmt = $pdo->prepare("SELECT * FROM users WHERE reset_token = ?");
@@ -17,7 +17,7 @@ if (isset($_GET['token'])) {
 
     // Yeni şifre formu gönderildiyse
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_password'])) {
-        $new_password = $_POST['new_password'];
+         $new_password = $_POST['new_password'];
 
         // Şifreyi hash’le
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
@@ -68,13 +68,14 @@ if (isset($_GET['token'])) {
   </header>
   <main>
     <h2>Yeni Şifre Belirleyin</h2>
-    <form method="POST">
+    <form method="POST">    
         <label for="new_password">Yeni Şifreniz:</label><br>
         <input type="password" name="new_password" id="new_password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
          title="Parola en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir."
          required><br><br>
         <input type="submit" value="Şifreyi Sıfırla" placeholder="Parolanız...">
-    </form></main>
+    </form>
+  </main>
     <footer>
     <div class="footer-nav"> 
         <ul>

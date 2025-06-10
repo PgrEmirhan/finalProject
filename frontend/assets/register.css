@@ -49,16 +49,27 @@
   body.dark-mode .slogan #word{ 
     color: white;
   }  
-  body.dark-mode   #dark-mode-toggle{
+  body.dark-mode #dark-mode-toggle-desktop{
     width: 2rem;
     height: 2rem;
-    border: 1px solid white;
+    border: 2px solid rgb(255, 255, 255);
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
     border-radius: 100%;
     font-size: 1.3rem;
-    background-color: black;
     cursor: pointer;
-    color: black;
   }
+    body.dark-mode #dark-mode-toggle-mobile{
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid rgb(0, 0, 0);
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    border-radius: 100%;
+    font-size: 1.3rem;
+    cursor: pointer;
+  }
+
   body.dark-mode .premium-price .price-card{
     background: linear-gradient(154deg, gray, black);    
     color: white;
@@ -68,10 +79,13 @@
     color: white; 
 
   }
-  body.dark-mode i{ 
-    color: white; 
+  body.dark-mode .popup-menu a {
+  text-decoration: none;
+  color: #333;
+  font-size: 18px;
+  font-weight: bold;
+}
 
-  }
     body.dark-mode #togglePassword{ 
     color: black; 
   }
@@ -85,34 +99,32 @@
     background-color:rgb(0, 0, 0);
 
   }
-  
-  #dark-mode-toggle{
-    width: 2rem;
-    height: 2rem;
-    border: 1px solid;
-    border-radius: 100%;
-    font-size: 1.3rem;
-    background-color: transparent;
-    cursor: pointer;
-    background-color: white;
-    color: black;
-    border: 1px solid rgb(0, 0, 0);
+  #dark-mode-toggle-desktop
+{
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
+  border-radius: 100%;
+  font-size: 1.3rem;
+  background-color: rgb(255, 255, 255);
+  cursor: pointer;
   }
+#dark-mode-toggle-mobile{
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
+  border-radius: 100%;
+  font-size: 1.3rem;
+  background-color: rgb(0, 0, 0);
+  cursor: pointer;
+}
+body.dark-mode .hamburger{ 
+  color: white;
+}  
 
-    .hesaplar{
-        margin: 0 auto;
-        display: flex;
-        justify-content: center;
-    }
-    .hesaplar a{  
-      text-decoration: none;
-      font-size: 24px;
-    }
-    .hesaplar i{
-      color: black;
-      margin: 10px;
-    }
-    .nav-container{ 
+     .nav-container{ 
       display: flex;
       justify-content: space-around;
       align-items: center;
@@ -140,10 +152,7 @@
       transition: all 0.7s;
       background-color: rgb(255, 255, 255);
  
-   } 
-   .container{ 
-    padding: 50px;
-   } 
+   }  
    main{
     display: flex;
     margin: auto 0;
@@ -152,10 +161,12 @@
     height: 100vh;
    }
    .container{ 
-      width: 40%;
+      width: 35%;
       margin-top: 100px;
       margin-bottom: 20px;
       border-radius: 35px; 
+      padding: 50px;
+      box-shadow: 0 0px 13px rgb(165, 165, 165);
    }
   
    form{      
@@ -168,15 +179,15 @@
     padding: 10px;
     outline: none;
     border: none;
-    border-bottom: 2px solid rgb(211, 211, 211); 
-          border-radius: 5px;
+    border: 1px solid rgb(39, 39, 39); 
+    border-radius: 5px;
    }
     form #kayit-btn{ 
       background: linear-gradient(450deg, rgb(255, 162, 162),rgb(193, 193, 250),rgb(210, 255, 210));      cursor: pointer;
       width: 100%;
       padding: 10px;
       outline: none;
-      border: 1px solid rgb(211, 211, 211);
+      border: 1px solid rgb(0, 0, 0);
       border-radius: 5px;
       font-weight: bolder;
       font-size: 18px;
@@ -236,32 +247,29 @@
       }
     
 
-      footer {
-    background-color: black;
-    color: white;
-    width: 100%;  
-    padding: 10px;
-    position: absolute;  
-    bottom: auto;  
-    left: 0;
-    right: 0;  
-    text-align: center; 
-    }
-
-    footer a{
-    text-decoration: none;
-    color: white;
-
-    }
-    .footer-nav{
-    display: flex;
-    justify-content: space-around;
-
-    }
-    .footer-nav ul{  list-style-type: none;
-    }
-    .hamburger {
-  display: none;
+ footer {
+ background-color: black;
+ color: white;
+ width: 100%;  
+ padding: 10px;
+ position: absolute;  
+ bottom: auto;  
+ left: 0;
+ right: 0;  
+ text-align: center; 
+ }
+ footer a{
+ text-decoration: none;
+ color: white;
+ }
+ .footer-nav{
+ display: flex;
+ justify-content: space-around;
+ }
+ .footer-nav ul{  list-style-type: none;
+ }
+    .hamburger { 
+      display: none;
   font-size: 26px;
   cursor: pointer;
   color: rgb(0, 0, 0);
@@ -337,8 +345,7 @@
   }
   .hamburger {
     display: block;
-    margin-right: 15px;
-    color: white;
+    margin-right: 15px; 
   }
 
   /* .cards flex yapısını sütun haline getir */
@@ -348,6 +355,10 @@
     gap: 45px;
     margin: 20px;
   }
+    #dark-mode-toggle-desktop{
+    display: none; 
+  }
+  
 
   /* .cards içindeki kartların genişliğini daralt */
   .cards .card1, 
@@ -410,18 +421,17 @@
     font-size: 14px;
     margin: 5px 0;
   }
- 
-   .footer-nav {
+    /* Footer düzeni */
+  .footer-nav {
     flex-direction: column;
     align-items: center;
     gap: 10px; 
-    justify-content: center;
   }
 
-  footer { 
-    justify-content: center;
+  footer {
     padding: 15px;
     position: relative; 
-    align-items: center;
-  }  
+  } 
+
+
 }

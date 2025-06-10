@@ -1,7 +1,7 @@
 <?php
 // Veritabanı bağlantısı
 require 'connect.php';
-$token = $_GET['token'];
+$token = $_POST['token'];
 
 // Paylaşımı veritabanından al
 $stmt = $pdo->prepare("SELECT s.*, f.file_path FROM shares s JOIN files f ON s.file_id = f.file_id WHERE s.share_link LIKE ?");

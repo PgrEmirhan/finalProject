@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start(); 
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -10,6 +10,7 @@ $user_id = $_SESSION['user_id'];
 
 // Eğer formdan üyelik tipi gelmişse:
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_type'])) {
+    $input_email = trim($_POST['email']);
     $membershipType = $_POST['membership_type']; // "monthly" veya "yearly"
 
     // Burada ödeme işlemi yapılmış varsayılıyor (ödeme entegrasyonu buraya gelir)
@@ -26,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_type'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Ödeme Sayfası</title>
@@ -38,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_type'])) {
 
 <header>
   <nav class="nav-container">
-    <a href="index.php"><img src="images/logo.png" alt="" style="width: 80px;"></a>
+    <a href="index.php"><img src="images/logo.png" alt="" style="width: 80px;" id="logo"></a>
     <ul>
       <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
       <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li>
@@ -96,9 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_type'])) {
         </div>
 
         <form class="form-container" action="confirm.php" method="POST">
-          <input type="hidden" name="card_type" id="card-type" value="visa"><!--
-          <input type="hidden" name="card_type" id="card-type" value="mastercard">
-          <input type="hidden" name="card_type" id="card-type" value="truy">!-->
+          <input type="hidden" name="card_type" id="card-type" value="visa">
             <input type="hidden" name="membership_type" value="<?php echo htmlspecialchars($_POST['membership_type'] ?? ''); ?>">
 
           <label>Kart Numarası</label>
@@ -152,6 +151,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_type'])) {
             <p align="center">Tüm haklar saklıdır. TE-FS &copy2025</p>
         </footer>
 <script>
+  window.addEventListener('DOMContentLoaded', () => {
+  const isDarkMode = localStorage.getItem('darkMode');
+  if (isDarkMode === 'enabled') {
+    document.body.classList.add('dark-mode');
+  }
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
+});
+
+function updateLogo() {
+  const logo = document.getElementById('logo');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  if (logo) {
+    logo.src = isDarkMode ? 'images/logo2.png' : 'images/logo.png';
+  }
+}
+
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
+document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  updateLogo();
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
+
   // Karttaki bilgileri güncelleyen fonksiyon
   function updateCard(input, fieldType) {
     const value = input.value.trim();

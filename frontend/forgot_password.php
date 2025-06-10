@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start(); 
 
 require 'connect.php';
 
@@ -14,7 +14,6 @@ require 'src/SMTP.php';
 require 'src/Exception.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
-    $input_email = trim($_POST['email']);
 
     if (!filter_var($input_email, FILTER_VALIDATE_EMAIL)) {
         $message = "Geçersiz e-posta adresi!";

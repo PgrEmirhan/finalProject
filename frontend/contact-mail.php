@@ -1,4 +1,6 @@
 <?php
+session_start(); // CSRF kontrolü için şart
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -44,4 +46,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "Mesaj gönderilemedi. Hata: {$mail->ErrorInfo}";
     }
 }
+
 ?>

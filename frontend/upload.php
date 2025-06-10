@@ -1,6 +1,7 @@
 <?php
     session_start();
-    
+    require 'connect.php';
+
     if (!isset($_SESSION['user_id'])) {
         header("Location: login.php");
         exit();
@@ -11,34 +12,40 @@
         header("Location: login.php");
         exit();
     }
-require 'connect.php';
-$avatar = null;
-
+    
     $user_id = $_SESSION['user_id'];   
     $username = $_SESSION['user_name'];
 
-$query = $pdo->prepare("SELECT * FROM users WHERE user_name = ?");
-$query->execute([$username]);
+$avatar = null;
+
+$query = $pdo->prepare("SELECT * FROM users WHERE user_id = ?");
+$query->execute([$user_id]);
 $user = $query->fetch();
+if (!$user) {
+    // Kullanıcı bulunamadıysa hata göster
+    echo "<p class='error-msg'>Kullanıcı bulunamadı.</p>";
+    exit;
+}
+
 $avatar = $user['avatar_path'] ?? null;
 $membership = $user['membership_type']; // Üyelik türünü alıyoruz
 $sql = "SELECT * FROM files WHERE user_id = ? and is_archived=0";
 $params = [$user_id];
 
 if ($membership != 'free') {
-    if (!empty($_GET['type'])) {
+    if (!empty($_POST['type'])) {
         $sql .= " AND file_name LIKE ?";
-        $params[] = "%." . ltrim($_GET['type'], '.'); // baştaki noktayı temizle
+        $params[] = "%." . ltrim($_POST['type'], '.'); // baştaki noktayı temizle
     }
 
-    if (!empty($_GET['min_size']) && is_numeric($_GET['min_size'])) {
+    if (!empty($_POST['min_size']) && is_numeric($_POST['min_size'])) {
         $sql .= " AND file_size >= ?";
-        $params[] = (int)$_GET['min_size'];
+        $params[] = (int)$_POST['min_size'];
     }
 
-    if (!empty($_GET['max_size']) && is_numeric($_GET['max_size'])) {
+    if (!empty($_POST['max_size']) && is_numeric($_POST['max_size'])) {
         $sql .= " AND file_size <= ?";
-        $params[] = (int)$_GET['max_size'];
+        $params[] = (int)$_POST['max_size'];
     }
 }
 
@@ -65,21 +72,6 @@ switch ($membership) {
         $maxFileSize = 500 * 1024 * 1024; // örnek: 500 MB dosya sınırı
         break;
 }
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file'])) {
-    $file = $_FILES['file'];
-    $fileSize = $file['size'];
-
-    // KOTA KONTROLÜ
-    if (($totalUsed + $fileSize) > $maxQuota) {
-        $uploadMessage = "<p class='error-msg'>Yükleme sınırınızı aştınız. Üyeliğinize uygun maksimum kapasiteyi doldurdunuz.</p>";
-    } elseif ($fileSize > $maxFileSize) {
-        $uploadMessage = "<p class='error-msg'>Bu dosya üyelik türünüz için çok büyük. Maksimum izin verilen dosya boyutu: " . round($maxFileSize / 1024 / 1024) . " MB</p>";
-    } else {
-        // Devam et: burada dosya taşınması, veritabanına yazılması vb. işlemler olur
-        // Şu anki mevcut dosya yükleme kodlarını buraya yerleştirirsiniz
-    }
-}
-
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -91,8 +83,13 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $fileError = $_FILES['file']['error'];
 
         $uploadMessage = '';
-
-        if ($fileError === 0) {
+     // KOTA KONTROLÜ
+    if (($totalUsed + $fileSize) > $maxQuota) {
+        $uploadMessage = "<p class='error-msg'>Yükleme sınırınızı aştınız. Üyeliğinize uygun maksimum kapasiteyi doldurdunuz.</p>";
+    } elseif ($fileSize > $maxFileSize) {
+        $uploadMessage = "<p class='error-msg'>Bu dosya üyelik türünüz için çok büyük. Maksimum izin verilen dosya boyutu: " . round($maxFileSize / 1024 / 1024) . " MB</p>";
+    } else {
+         if ($fileError === 0) {
             $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
             $allowed = array('jpg', 'jpeg', 'png', 'gif', 'pdf', 'txt', 'docx', 'zip');
 
@@ -128,11 +125,14 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } else {
             $uploadMessage = "<p class='error-msg'>Dosya yüklenirken bir hata oluştu. Lütfen tekrar deneyin.</p>";
         }
+
+    } 
+
     }
 
 // Dosya silme işlemi
-if (isset($_GET['delete_file'])) {
-    $fileId = $_GET['delete_file'];
+if (isset($_POST['delete_file'])) {
+    $fileId = $_POST['delete_file'];
     $userId = $_SESSION['user_id']; // Giriş yapmış kullanıcının ID'si
 
     // Veritabanından dosya bilgilerini al
@@ -160,8 +160,8 @@ if (isset($_GET['delete_file'])) {
     }
 }
  
-        if (isset($_GET['share_file'])) {
-            $file_id_to_share = $_GET['share_file'];
+        if (isset($_POST['share_file'])) {
+            $file_id_to_share = $_POST['share_file'];
 
             try {
                 $stmt = $pdo->prepare("SELECT * FROM files WHERE file_id = ? AND user_id = ?");
@@ -230,16 +230,16 @@ if (isset($_GET['delete_file'])) {
     <!-- Normal Menü (büyük ekran) -->
     <ul class="nav-links">
       <li><a href="contact.php"><i class="fas fa-envelope icon"></i> İletişim</a></li>
-        <button id="dark-mode-toggle">
-      <i class="fa-solid fa-moon"></i>
-    </button>
 
     </ul>
 
+        <button id="dark-mode-toggle">
+      <i class="fa-solid fa-moon"></i>
+    </button>
     <!-- Dark Mode -->
 
     <!-- Gizli Profil İkonu -->
-    <?php if (!$user['is_profile_public']): ?>
+<?php if (isset($user['is_profile_public']) && !$user['is_profile_public']): ?>
       <span title="Profiliniz gizli 🔐">🔐</span>
     <?php endif; ?>
 
@@ -281,7 +281,7 @@ if (isset($_GET['delete_file'])) {
   </header>
   <main>
     <div class="upload">
-        <h2 style="font-size: 25px; ">Hoş geldiniz, <?php echo htmlspecialchars($username); ?>!</h2>   
+        <h2 style="font-size: 25px; ">Hoş geldiniz, <?php echo htmlspecialchars($username); ?> !</h2>   
            <img src="images/file-upload.png" alt="" width="240"><br>
  
         <?php if (isset($uploadMessage)) echo $uploadMessage; ?>
@@ -301,16 +301,16 @@ if (isset($_GET['delete_file'])) {
 
         <button class="upload-btn" onclick="uploadFile()">Dosya Yükle</button>
         <?php if ($membership!=='free'):?>
-        <form id="filterForm" method="GET" action="upload.php">
+        <form id="filterForm" method="POST" action="upload.php">
         <h3>Filtreleme</h3>
         <label>Tür (uzantı, örn: txt, pdf):</label>
-        <input type="text" name="type" id="type" value="<?= htmlspecialchars($_GET['type'] ?? '') ?>">
+        <input type="text" name="type" id="type" value="<?= htmlspecialchars($_POST['type'] ?? '') ?>">
         <br>
         <label>Minimum Boyut (bayt):</label>
-        <input type="number" id="min-size" name="min_size" value="<?= htmlspecialchars($_GET['min_size'] ?? '') ?>">
+        <input type="number" id="min-size" name="min_size" value="<?= htmlspecialchars($_POST['min_size'] ?? '') ?>">
         <br>
         <label>Maksimum Boyut (bayt):</label>
-        <input type="number" name="max_size" id="max-size" value="<?= htmlspecialchars($_GET['max_size'] ?? '') ?>">
+        <input type="number" name="max_size" id="max-size" value="<?= htmlspecialchars($_POST['max_size'] ?? '') ?>">
         <br>
         <input type="submit" value="Filtrele" id="filter-btn">
         <button id="showAllBtn">Hepsini Getir</button>
@@ -325,17 +325,23 @@ if (isset($_GET['delete_file'])) {
     <?php if (count($files) > 0): ?>
         <?php foreach ($files as $file): ?>
             <div>
-                <?php if($membership!=='free'):?>
-                <label style="cursor: pointer;">
+                <?php if($membership!=='free' ):?>
                 <input type="checkbox" name="files[]" value="<?= htmlspecialchars($file['file_path'])  ?>">
+                <?php endif;?>
+                <label style="cursor: pointer;">                
                 <?= htmlspecialchars($file['file_name']) ?> (<?= $file['file_size'] ?> bayt)          
                 </label>
-                <?php endif;?>
-                <a href="uploads/<?= basename($file['file_path']) ?>" download>İndir</a> | 
-                <a href="upload.php?delete_file=<?= $file['file_id'] ?>" onclick="return confirm('Bu dosyayı silmek istediğinizden emin misiniz?');">Sil</a> 
-            <?php if ($user['is_files_public']): ?>
-            | <a href="#" onclick="openShareModal('<?= addslashes(htmlspecialchars(basename($file['file_path']))) ?>'); return false;">Paylaş</a> 
-            <?php endif; ?>
+
+        <!-- İndir -->
+        <a href="uploads/<?= basename($file['file_path']) ?>" download>
+            <button type="button">İndir</button>
+        </a>
+        <button type="button" onclick="if(confirmDelete(<?= $file['file_id']; ?>)){ window.location='upload.php?delete_file=<?= $file['file_id']; ?>'; }">
+          Sil
+        </button>
+            <button type="button" onclick="openShareModal('<?= addslashes(htmlspecialchars(basename($file['file_path']))) ?>');">
+                Paylaş
+            </button>
             </div>
         <?php endforeach; ?>
         <br>
@@ -633,7 +639,25 @@ function openShareModal(fileName, fileId) {
     console.log("Dosya yolu alınamadı.");
   }
 }
-
+    
+function confirmDelete(fileId) {
+    if (confirm('Emin misiniz? Bu dosya kalıcı olarak silinecek?')) {
+          const formData = new FormData();
+        formData.append('delete_file', fileId);
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'upload.php', true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                alert('Dosya başarıyla silindi.');
+                location.reload();
+            } else {
+                alert('Dosya silinirken bir hata oluştu.');
+            }
+        };
+        xhr.send(formData);
+    }
+}
 function copyLink() {
   const copyText = document.getElementById("shareLink");
   copyText.select();

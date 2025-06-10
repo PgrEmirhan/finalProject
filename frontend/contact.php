@@ -3,16 +3,17 @@
 require 'connect.php';
 
 session_start();
+  if (empty($_SESSION['csrf_token'])) {
+      $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+  }
+
 $isLoggedIn = isset($_SESSION['user_id']);
-$avatar = null;
-
-    $user_id = $_SESSION['user_id'];   
-    $username = $_SESSION['user_name'];
-
-$query = $pdo->prepare("SELECT * FROM users WHERE user_name = ?");
-$query->execute([$username]);
-$user = $query->fetch(); 
-$avatar = $user['avatar_path'] ?? null;
+if ($isLoggedIn) {
+    $query = $pdo->prepare("SELECT * FROM users WHERE user_id = ?");
+    $query->execute([$_SESSION['user_id']]);
+    $user = $query->fetch();
+    $avatar = $user['avatar_path'] ?? null;
+}
 ?> 
 <!DOCTYPE html>
 <html lang="en">
@@ -30,30 +31,44 @@ $avatar = $user['avatar_path'] ?? null;
 </head>
 <body>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-  <header>
-  <!-- NAV -->
-  <nav class="nav-container">
-    <a href="index.php">
-      <img src="images/logo.png" alt="Logo" style="width: 80px; margin-right: 111px;">
+  <header> 
+   <nav class="nav-container">
+    <a href="index.php" id="logo">
+      <img src="images/logo.png" alt="Logo" style="width: 80px;">
     </a>
+<?php if (!$isLoggedIn): ?>
 
- <?php if (!$isLoggedIn): ?>
     <!-- Normal Menü (büyük ekran) -->
     <ul class="nav-links">
-      <li><a href="contact.php"><i class="fas fa-envelope icon"></i> Üye ol</a></li>
-        <button id="dark-mode-toggle">
-      <i class="fa-solid fa-moon"></i>
-    </button>
-
+    <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
+    <li><a href="login.php"><i class="fas fa-sign-in"></i> Giriş Yap</a></li> 
     </ul>
 
-  <?php endif; ?>
-    <!-- Dark Mode -->
- <?php if ($isLoggedIn): ?>
-        <button id="dark-mode-toggle">
+        <button id="dark-mode-toggle-desktop">
       <i class="fa-solid fa-moon"></i>
-    </button>
+    </button> 
 
+    <!-- Hamburger Menü (mobil) -->
+    <div class="hamburger" onclick="openPopup()">☰</div>
+  </nav>
+
+  <!-- Mobil Popup Menü -->
+  <div class="popup-overlay" id="popupMenu">
+    <div class="popup-menu">
+      <span class="close-btn" onclick="closePopup()">&times;</span>
+      <ul>
+    <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
+    <li><a href="contact.php"><i class="fas fa-sign-in"></i> Giriş Yap</a></li> 
+        <li> <button id="dark-mode-toggle-mobile">
+      <i class="fa-solid fa-moon"></i>
+    </button> 
+</li>
+       </ul>
+    </div>
+  </div>
+
+     <?php endif; ?>
+<?php if ($isLoggedIn): ?>
 
     <!-- Avatar Butonu -->
     <button id="avatarBtn">
@@ -70,8 +85,10 @@ $avatar = $user['avatar_path'] ?? null;
       <a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a>
       <a href="archive.php"><i class="fa-solid fa-box"></i> Arşivlerim</a>
       <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a>
-
-
+              <li> <button id="dark-mode-toggle-mobile">
+      <i class="fa-solid fa-moon"></i>
+    </button> 
+</li>
     </div>
 
     <!-- Hamburger Menü (mobil) -->
@@ -88,30 +105,31 @@ $avatar = $user['avatar_path'] ?? null;
         <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a></li>
         <li><a href="archive.php"><i class="fa-solid fa-box"></i> Arşivlerim</a></li>
         <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a></li>
-        <li>
-        <button id="dark-mode-toggle">
+                <li> <button id="dark-mode-toggle-mobile">
       <i class="fa-solid fa-moon"></i>
-    </button></li>
+    </button> 
+</li>
       </ul>
     </div>
   </div>
+
   <?php endif; ?>
   </header>
   <main>    
     <div class="container">
       <h3 align="center" style="font-size: 32px;">Destek ve Tavsiye İçin Bizimle İletişime Geçin</h3>
       <form action="contact-mail.php" method="post"> 
+ 
         <div class="kadi-icon">
       <input type="text" name="kadi" id="kadi" placeholder="adınız..." style="width: 100%;"> <i class="fa-solid fa-user"></i></div>
         <div class="kadi-icon">
       <input type="text" name="email" id="email" placeholder="mail adresiniz..." style="width: 100%;"> <i class="fa-solid fa-envelope"></i></div>
         <div>
-        <textarea name="message" id="message" cols="54" rows="9" placeholder="mesajınız..."></textarea>
+        <textarea name="message" id="message" cols="54" rows="6" placeholder="mesajınız..."></textarea>
         </div>
           <input type="submit" value="Gönder" id="gonder-btn">
           <p align="center"> * Tekrar eden mesajlar spama düşecektir *  </p>
-        </form>
-         
+        </form> 
     </div>
   </main>
         <footer>  
@@ -154,7 +172,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // Butona tıklanınca dark mode aç/kapat
-document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
 
   if (document.body.classList.contains('dark-mode')) {
@@ -163,6 +181,16 @@ document.getElementById('dark-mode-toggle').addEventListener('click', () => {
     localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
   }
 });  // Avatar dropdown
+document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled'); // aktif halde sakla
+  } else {
+    localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
+  }
+});  // Avatar dropdown
+
   const avatarBtn = document.getElementById('avatarBtn');
   const dropdown = document.getElementById('dropdownMenu');
 
@@ -177,7 +205,7 @@ document.getElementById('dark-mode-toggle').addEventListener('click', () => {
 
   // Hamburger popup
   function openPopup() {
-    document.getElementById("popupMenu").style.display = "flex";
+    document.getElementById("popupMenu").style.display = "block";
   }
 
   function closePopup() {
@@ -188,14 +216,12 @@ document.getElementById('dark-mode-toggle').addEventListener('click', () => {
   window.addEventListener("click", function (e) {
     const dropdown = document.getElementById("dropdownMenu");
     const avatarBtn = document.getElementById("avatarBtn");
-    if (!dropdown.contains(e.target) && !avatarBtn.contains(e.target)) {
-      dropdown.style.display = "none";
-    }
+        const popup = document.getElementById("popupMenu");
 
-    const popup = document.getElementById("popupMenu");
-    if (e.target === popup) {
-      closePopup();
-    }
+    if (!dropdown.contains(e.target) && !avatarBtn.contains(e.target)  && !popup.contains(e.target)) {
+      dropdown.style.display = "none";
+
+    } 
   });
 
 

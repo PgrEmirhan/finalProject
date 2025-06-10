@@ -1,47 +1,53 @@
  <?php
-    require 'connect.php';
-
+    require 'connect.php'; 
+    session_start();
     $shareLink = '';  
     $user_id = null; // Kullanıcı ID'si boş, kullanıcı girişine göre güncellenecek
 
     // Dosya yükleme işlemi
-    if (isset($_FILES['file'])) {
-        $fileName = $_FILES['file']['name'];
-        $fileTmpName = $_FILES['file']['tmp_name'];
-        $fileError = $_FILES['file']['error'];
-        $fileSize = $_FILES['file']['size'];
-        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'txt', 'docx', 'zip'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
+    $file = $_FILES['file'];
+    $fileName = $file['name'];
+    $fileTmpName = $file['tmp_name'];
+    $fileError = $file['error'];
+    $fileSize = $file['size'];
+    $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'txt', 'docx', 'zip'];
 
-        // Dosya hatası yoksa, yükleme işlemini başlat
-        if ($fileError === 0) {
-            if (!in_array($fileExt, $allowedExtensions)) {
-                echo "<p class='error-msg'>Geçersiz dosya türü. Yalnızca jpg, jpeg, png, gif, pdf, txt, docx, zip dosyalarına izin verilmektedir.</p>";
-                exit;
-            }
-
+    if ($fileError === 0) {
+        if (!in_array($fileExt, $allowed)) {
+            echo "<p class='error-msg'>Geçersiz dosya türü.</p>";
+        }   else {
             $newFileName = uniqid('', true) . '.' . $fileExt;
-            $fileDestination = __DIR__ .  '/uploads/' . $newFileName;
+            $fileDestination = __DIR__ . '/uploads/' . $newFileName;
 
-            // Dosyayı belirtilen dizine taşıma işlemi
             if (move_uploaded_file($fileTmpName, $fileDestination)) {
-                $currentTimestamp = time();
-                $expireTimestamp = $currentTimestamp + 86400;  // Dosyanın geçerliliği 1 gün (86400 saniye)
+                $uploadedAt = time();
+                $expiryTime = isset($user_id) ? '0000-00-00 00:00:00' : $uploadedAt + 86400;
+                $is_guest = isset($user_id) ? 0 : 1;
 
-                // Dosya veritabanına kaydediliyor
-                $stmt = $pdo->prepare("INSERT INTO files (file_name, file_path, is_guest, uploaded_at, expiry_time) VALUES (?, ?, 1, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO files (file_name, file_path, user_id, is_guest, uploaded_at, expiry_time, file_size) 
+                                       VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
-                $fileName,
-                $fileDestination,
-                $currentTimestamp,
-                $expireTimestamp
+                    $fileName,
+                    $fileDestination,
+                    $user_id ?? null,
+                    $is_guest,
+                    $uploadedAt,
+                    $expiryTime,
+                    $fileSize
                 ]);
+
                 echo "<p class='success-msg'>Dosya başarıyla yüklendi.</p>";
-            }  
-        } else {
-            echo "<p class='error-msg'>Dosya yüklenirken bir hata oluştu.</p>";
+            } else {
+                echo "<p class='error-msg'>Dosya taşınamadı.</p>";
+            }
         }
+    } else {
+        echo "<p class='error-msg'>Yükleme sırasında hata oluştu.</p>";
     }
+}
+
 
     // Veritabanından tüm dosyaları çekme
     $files = [];
@@ -70,8 +76,9 @@ $stmt = $pdo->prepare("DELETE FROM files WHERE expiry_time < ? AND is_guest = 1"
 $stmt->execute([$currentTimestamp]);
 
     // Dosya silme işlemi
-    if (isset($_GET['delete_file'])) {
-        $file_id_to_delete = $_GET['delete_file'];
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_file'])) {
+ 
+        $file_id_to_delete = $_POST['delete_file'];
         $stmt = $pdo->prepare("SELECT * FROM files WHERE file_id = ? AND (is_guest = 1)");
         $stmt->execute([$file_id_to_delete]);
         $file = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -90,8 +97,8 @@ $stmt->execute([$currentTimestamp]);
     }
 
     // Dosya paylaşma işlemi
-    if (isset($_GET['share_file'])) {
-        $file_id_to_share = $_GET['share_file'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['share_file'])) {
+         $file_id_to_share = $_POST['share_file'];
 
         // Kullanıcıya ait dosya sorgulanıyor
         $stmt = $pdo->prepare("SELECT * FROM files WHERE file_id = ? AND (user_id = ? OR is_guest = 1)");
@@ -109,8 +116,8 @@ $stmt->execute([$currentTimestamp]);
 
     // Dosyaları veritabanından çekme
     try {
-        $stmt = $pdo->prepare("SELECT * FROM files WHERE user_id = ? OR is_guest = 1");
-        $stmt->execute([$user_id]);
+        $stmt = $pdo->prepare("SELECT * FROM files WHERE user_id = ? OR is_guest = 1");  
+        $stmt->execute([$user_id]); // BUNU EKLEMELİSİN
         $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         echo "Veritabanı hatası: " . $e->getMessage();
@@ -138,18 +145,16 @@ $stmt->execute([$currentTimestamp]);
         <header>
 <!-- NAVIGATION BAR -->
 <nav class="nav-container">
-  <a href="index.php"><img src="images/logo.png" alt="" style="width: 80px;"></a>
+  <a href="index.php"><img src="images/logo.png" alt="" style="width: 80px;" id="logo"></a>
 
   <!-- NORMAL MENÜ (büyük ekranlar için) -->
   <ul class="nav-links">
     <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
-    <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li>
-       <!-- DARK MODE BUTTON -->
-      <li><button id="dark-mode-toggle">
+    <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li> <!-- DARK MODE BUTTON --> 
+  </ul>       
+        <button id="dark-mode-toggle-desktop">
          <i class="fa-solid fa-moon"></i>
-        </button>
-  </ul>
-
+        </button> 
 
   <!-- HAMBURGER ICON (küçük ekranlar için) -->
   <div class="hamburger" onclick="openPopup()">☰</div>
@@ -162,13 +167,15 @@ $stmt->execute([$currentTimestamp]);
       <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
       <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li> 
    <!-- DARK MODE BUTTON -->
-      <li><button id="dark-mode-toggle">
+      <li>
+        <button id="dark-mode-toggle-mobile">
          <i class="fa-solid fa-moon"></i>
         </button>
 </li>
     </ul>
   </div>
 </div>
+<br>
         </header>
         <main>  
         <div align="center" class="slogan">
@@ -190,24 +197,34 @@ $stmt->execute([$currentTimestamp]);
                 <br>
 
                 <form id="uploadForm" action="index.php" method="POST" enctype="multipart/form-data" style="display:none;">
-                    <input type="file" name="file" id="fileInput" />
+                    <input type="file" name="file" id="fileInput" /> 
+
                 </form>
 
                 <button class="upload-btn" onclick="uploadFile()">Dosya Yükle</button>
-
+ 
                 <div class="file-list">
                     <h3 align="center">Yüklediğiniz Dosyalar:</h3>
-                    <?php
-                        foreach ($files as $file) { 
-                            $filePath = 'uploads/' . basename($file['file_path']);
-                            echo '<p>' . $file['file_name'] . ' - ';
-                            echo '<a href="#" onclick="confirmDelete(' . $file['file_id'] . ')">Sil</a> | ';
-                            echo '<a href="?share_file=' . $file['file_id'] . '">Paylaş</a> | ';
-                            echo '<a href="' . $filePath . '" download >İndir</a></p>';
-                        }
-                    ?>
-                </div>
-            <h2 align="center" style="font-size: 32px;"><i class="fas fa-check-circle"></i>
+                 <?php foreach ($files as $file): ?>
+                    <form method="post"  action="index.php" style="margin-bottom: 10px;" enctype="multipart/form-data">
+                        <input type="hidden" name="file_id" value="<?php echo $file['file_id']; ?>">
+
+                        <strong>                                        <label style="cursor: pointer;">                
+                <?= htmlspecialchars($file['file_name']) ?> (<?= $file['file_size'] ?> bayt)                          </label>
+
+</strong>  
+        <button type="button" onclick="if(confirmDelete(<?= $file['file_id']; ?>)){ window.location='index.php?delete_file=<?= $file['file_id']; ?>'; }">
+          Sil
+        </button>|  
+                        <button type="submit" name="share_file" value="<?php echo $file['file_id']; ?>">Paylaş</button>|
+        <a href="uploads/<?= basename($file['file_path']) ?>" download>
+            <button type="button">İndir</button>
+        </a>
+                    </form>
+                <?php endforeach; ?>
+
+                </div> <br>
+            <h2 align="center" class="cards-title"><i class="fas fa-check-circle"></i>
             Neden bizi tercih etmelisiniz?</h2>
             <div class="cards">
             <div class="card1"><i class="fa-solid fa-share-from-square" style="font-size: 48px; display: flex;
@@ -289,7 +306,7 @@ $stmt->execute([$currentTimestamp]);
         <li><i class="fa-solid fa-check"></i> E-posta üzerinden destek </li>
       </ul>
       <input type="hidden" name="membership_type" value="free">
-      <a href="register.php"><button class="uyelik-btn">Kayıt Ol</button></a> 
+      <a href="register.php"><button class="uyelik-btn">Şimdi Geçiş Yap</button></a> 
     </div>
     <div class="price-card"> 
       <h3 style="font-size: 32px;"> Aylık Üyelik </h3>   
@@ -466,36 +483,62 @@ $stmt->execute([$currentTimestamp]);
         document.getElementById('fileInput').files = e.dataTransfer.files;
     });
     
-    function confirmDelete(fileId) {
-        if (confirm('Emin misiniz? Bu dosya kalıcı olarak silinecek.')) {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', 'index.php?delete_file=' + fileId, true);
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    alert('Dosya başarıyla silindi.');
-                    location.reload(); 
-                } else {
-                    alert('Dosya silinirken bir hata oluştu.');
-                }
-            };
-            xhr.send();
-        }
-    } // Sayfa yüklendiğinde localStorage'dan dark mode'u kontrol et
+function confirmDelete(fileId) {
+    if (confirm('Emin misiniz? Bu dosya kalıcı olarak silinecek?')) {
+ 
+        const formData = new FormData();
+        formData.append('delete_file', fileId); 
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'index.php', true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                alert('Dosya başarıyla silindi.');
+                location.reload();
+            } else {
+                alert('Dosya silinirken bir hata oluştu.');
+            }
+        };
+        xhr.send(formData);
+    }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   const isDarkMode = localStorage.getItem('darkMode');
   if (isDarkMode === 'enabled') {
     document.body.classList.add('dark-mode');
   }
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
 });
 
-// Butona tıklanınca dark mode aç/kapat
-document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+function updateLogo() {
+  const logo = document.getElementById('logo');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  if (logo) {
+    logo.src = isDarkMode ? 'images/logo-1.png' : 'images/logo.png';
+  }
+}
+
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
+document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
+  updateLogo();
 
   if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('darkMode', 'enabled'); // aktif halde sakla
+    localStorage.setItem('darkMode', 'enabled');
   } else {
-    localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
+document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  updateLogo();
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
   }
 });
   const banner   = document.getElementById('cookie-banner');
@@ -529,8 +572,7 @@ window.addEventListener("click", function (e) {
   if (popup.style.display === "flex" && !popupMenu.contains(e.target) && !hamburger.contains(e.target)) {
     closePopup();
   }
-});
-  
+}); 
         </script>
         </body>
         </html>

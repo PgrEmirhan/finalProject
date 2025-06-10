@@ -2,7 +2,10 @@
 session_start();
  
 require 'connect.php';
- 
+
+// Form gönderildiyse işle
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
 if (isset($_POST['username']) && isset($_POST['password'])) {
     $input_username = trim($_POST['username']);  
     $input_password = $_POST['password'];      
@@ -20,6 +23,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     } else { 
         $error_message = "Hatalı kullanıcı adı veya şifre!";
     }
+
+}
 }
 ?>
  
@@ -49,10 +54,12 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
   <!-- NORMAL MENÜ (büyük ekranlar için) -->
   <ul class="nav-links">
-    <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
+<li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
     <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li>
   </ul>
-
+<button id="dark-mode-toggle-desktop">
+ <i class="fa-solid fa-moon"></i>
+</button>
 
   <!-- HAMBURGER ICON (küçük ekranlar için) -->
   <div class="hamburger" onclick="openPopup()">☰</div>
@@ -62,11 +69,11 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 <div class="popup-overlay" id="popupMenu">
   <div class="popup-menu"> 
     <ul>
-    <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
+<li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
     <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li>
 
    <!-- DARK MODE BUTTON -->
-      <li><button id="dark-mode-toggle">
+      <li><button id="dark-mode-toggle-mobile">
          <i class="fa-solid fa-moon"></i>
         </button>
 </li>
@@ -143,24 +150,41 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         this.classList.toggle("fa-eye-slash");
     });
     
- // Sayfa yüklendiğinde localStorage'dan dark mode'u kontrol et
 window.addEventListener('DOMContentLoaded', () => {
   const isDarkMode = localStorage.getItem('darkMode');
   if (isDarkMode === 'enabled') {
     document.body.classList.add('dark-mode');
   }
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
 });
 
-// Butona tıklanınca dark mode aç/kapat
-document.getElementById('dark-mode-toggle').addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
+function updateLogo() {
+  const logo = document.getElementById('logo');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  if (logo) {
+    logo.src = isDarkMode ? 'images/logo2.png' : 'images/logo.png';
+  }
+}
 
+document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode'); 
   if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('darkMode', 'enabled'); // aktif halde sakla
+    localStorage.setItem('darkMode', 'enabled');
   } else {
-    localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
+    localStorage.setItem('darkMode', 'disabled');
   }
 });
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
+document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode'); 
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
+
 function openPopup() {
   document.getElementById("popupMenu").style.display = "flex";
 }

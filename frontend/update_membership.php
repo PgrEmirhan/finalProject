@@ -26,7 +26,7 @@ if (!in_array($membership, $valid_memberships)) {
 
     if ($success) {
         // Başarılıysa yönlendir
-        if (isset($_GET['redirect'])) {
+        if (isset($_POST['redirect'])) {
             header("Location: settings.php?success=updated");            
          } 
     }

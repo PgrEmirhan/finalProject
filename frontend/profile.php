@@ -1,8 +1,7 @@
 <?php
 require 'connect.php';
-require 'auth.php';
-
-$id = $_SESSION['user_id'];
+require 'auth.php'; 
+ $id = $_SESSION['user_id'];
 
 $stmt = $pdo->prepare("SELECT user_name, email, avatar_path, membership_type FROM users WHERE user_id=?");
 $stmt->execute([$id]);
@@ -42,13 +41,11 @@ $user = $stmt->fetch();
 
   <!-- Normal Menü (büyük ekran) -->
   <ul class="nav-links">
-    <li><a href="contact.php"><i class="fas fa-envelope icon"></i> İletişim</a></li>
-      <button id="dark-mode-toggle">
+    <li><a href="contact.php"><i class="fas fa-envelope icon"></i> İletişim</a></li> 
+  </ul>
+    <button id="dark-mode-toggle">
     <i class="fa-solid fa-moon"></i>
   </button>
-
-  </ul>
- 
 
   <!-- Avatar Butonu -->
   <button id="avatarBtn">
@@ -79,6 +76,11 @@ $user = $stmt->fetch();
       <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a></li>
       <li><a href="archive.php"><i class="fa-solid fa-box"></i> Arşivlerim</a></li>
       <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a></li>
+      <li>
+        <button id="dark-mode-toggle">
+        <i class="fa-solid fa-moon"></i>
+        </button> 
+      </li>
     </ul>
   </div>
 </div>
@@ -92,20 +94,19 @@ $user = $stmt->fetch();
 <?php endif; ?></center>
 
 <form action="profile_update.php" method="POST" enctype="multipart/form-data"> 
-
 <h2>Merhaba, <?= htmlspecialchars($user['user_name'] ?: $user['user_name']) ?></h2> 
 <p><strong>Kullanıcı Adı: </strong>
 <input type="text" name="user_name" value="<?= htmlspecialchars($user['user_name']) ?>">
 </p>  
-  <label>E‑posta
+  <label><strong>E‑posta:</strong>
     <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>">
   </label>
 
-  <label>Yeni Avatar Yükle
+  <label><strong>Yeni Avatar Yükle</strong><br>
     <input type="file" name="avatar">
   </label>
 
-<a type="submit" class="upload">Güncelle</a>
+<button type="submit" class="upload">Güncelle</button>
 
 <a href="change_password.php" class="btn">Şifre Değiştir</a>
 <a href="upload.php" class="back-on">Önceki ekrana dön</a>

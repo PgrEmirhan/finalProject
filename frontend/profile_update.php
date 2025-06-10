@@ -15,21 +15,25 @@ if (!empty($_FILES['avatar']['name'])) {
     $avatar_path = 'uploads/avatar_' . $id . '.' . $ext;
     move_uploaded_file($_FILES['avatar']['tmp_name'], $avatar_path);
 }
-    
+
 // Veritabanını güncelle
 $query = "UPDATE users SET user_name = ?, email = ?, membership_type=?" . ($avatar_path ? ", avatar_path = ?" : "") . " WHERE user_id = ?";
 $params = [$user_name, $email, $membership_type];
 if ($avatar_path) $params[] = $avatar_path;
 $params[] = $id;
-// Tüm işlemleri yaptıktan sonra:
+
+$stmt = $pdo->prepare($query);
+$stmt->execute($params);
+
+// 🔁 Session güncelle (yeni kullanıcı adının oturumda da görünmesi için)
+$_SESSION['user_name'] = $user_name;
+
+// Eğer ödeme yönlendirmesi isteniyorsa
 if (isset($_GET['redirect']) && $_GET['redirect'] == 1) {
     header("Location: payment.php?new=$membership_type");
     exit;
 }
 
-$stmt = $pdo->prepare($query);
-$stmt->execute($params);
-
+// Profil sayfasına geri dön
 header("Location: profile.php?ok=1");
 exit;
-    

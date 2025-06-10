@@ -15,7 +15,8 @@
   
   body.dark-mode .nav-container{
     background-color: black;
-    color: rgb(255, 255, 255);
+    color: rgb(255, 255, 255); 
+    border-bottom: 2px solid rgb(255, 255, 255);
   }
   body.dark-mode .nav-container a{
     background-color: black;
@@ -39,7 +40,20 @@
   }   body.dark-mode #avatar { 
     border:2px solid white;
   } 
+  body.dark-mode input[type="text"], input[type="email"] { width: 100%; padding: 12px; margin-top: 4px; border-radius: 8px; border: 1px solid rgb(255, 255, 255);}
 
+  body.dark-mode .dropdown a {
+  color: #ffffff;
+  padding: 10px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body.dark-mode .dropdown a:hover {
+  background-color: #7c7c7c;
+}
   body.dark-mode footer span{ 
     color: white;
   } 
@@ -68,7 +82,7 @@
   body.dark-mode   #dark-mode-toggle{
     width: 2rem;
     height: 2rem;
-    border: 1px solid white;
+    border: 2px solid white;
     border-radius: 100%;
     font-size: 1.3rem;
     background-color: transparent;
@@ -77,7 +91,7 @@
   #dark-mode-toggle{
     width: 2rem;
     height: 2rem;
-    border: 1px solid;
+    border: 2px solid black;
     border-radius: 100%;
     font-size: 1.3rem;
     background-color: transparent;
@@ -95,7 +109,7 @@
             left: 0;    
             position: fixed;
             z-index: 1;
-            border-bottom: 2px solid;
+            border-bottom: 2px solid black;
             }
             .nav-container ul{
             margin-left: 890px;
@@ -115,7 +129,7 @@
         margin-bottom: 30px;
     } 
     label { display: block; margin-top: 10px; }
-    input[type="text"], input[type="email"], input[type="file"] { width: 100%; padding: 12px; margin-top: 4px; border-radius: 8px; border: none;}
+    input[type="text"], input[type="email"] { width: 100%; padding: 12px; margin-top: 4px; border-radius: 8px; border: 1px solid black;}
     #avatar { margin-top: 10px; border-radius: 100%; background-color: gray; border: 2px solid black;}
     .btn { display: inline-block; margin-top: 15px; padding: 10px 15px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; }  
     .back-on{
@@ -137,6 +151,7 @@ display: inline-block; margin-top: 15px; padding: 10px 15px; background: #28a745
         right: 0;  
         text-align: center; 
         font-family: 'Inter',sans-serif;
+        border-top: 2px solid white;
         }
 
         footer a{
@@ -174,40 +189,46 @@ display: inline-block; margin-top: 15px; padding: 10px 15px; background: #28a745
   color: inherit;
 }
   /* Mobil Popup */
-  .popup-overlay {
-  display: none; /* Başta gizli */
+.popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: rgba(0,0,0,0.6);
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
+
+/* POPUP MENÜ */
 .popup-menu {
   background-color: white;
-  padding: 20px;
+  padding: 10px;
   border-radius: 10px;
-  color: black;
+  width: 100%;
+  max-width: 400px;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-  .popup-menu ul {
-    list-style: none;
-    padding: 0;
-  }
+.popup-menu ul {
+  list-style: none;
+  padding: 0;
+}
 
-  .popup-menu ul li {
-    margin: 15px 0;
-  }
+.popup-menu li {
+  margin: 20px 0;
+  text-align: center;
+}
 
-  .popup-menu ul li a {
-    text-decoration: none;
-    color: #333;
-    font-size: 18px;
-  }
+.popup-menu a {
+  text-decoration: none;
+  color: #333;
+  font-size: 18px;
+  font-weight: bold;
+}
 
   .close-btn {
     position: absolute;
@@ -298,17 +319,7 @@ display: inline-block; margin-top: 15px; padding: 10px 15px; background: #28a745
     }  
     .dropdown {
       display: none;
-    }
-
-  /* Popup menü boyutu */
-  .popup-menu {
-    width: 90%;
-  }
-
-  .popup-menu ul li a {
-    font-size: 16px;
-  }
-
+    } 
 
     .hamburger {
     display: block;

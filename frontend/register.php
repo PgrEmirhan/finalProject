@@ -1,8 +1,12 @@
 <?php
+
 session_start();
 
 require 'connect.php';
 
+// Form gönderildiyse işle
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+ 
 if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['email'])) {
     $input_username = $_POST['username'];
     $input_password = $_POST['password'];
@@ -26,14 +30,14 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
  
         $stmt = $pdo->prepare("INSERT INTO users (user_name, user_password, email, is_guest) VALUES (?, ?, ?, ?)");
         $stmt->execute([$input_username, $hashed_password, $input_email, $is_guest]);
- 
         header("Location: login.php");
         exit();
     }
 }
+}
 ?>
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -53,10 +57,12 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
 
   <!-- NORMAL MENÜ (büyük ekranlar için) -->
   <ul class="nav-links">
-    <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
+    <li><a href="login.php"><i class="fas fa-sign-in"></i> Giriş Yap</a></li>
     <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li>
   </ul>
-
+<button id="dark-mode-toggle-desktop">
+ <i class="fa-solid fa-moon"></i>
+</button>
 
   <!-- HAMBURGER ICON (küçük ekranlar için) -->
   <div class="hamburger" onclick="openPopup()">☰</div>
@@ -66,11 +72,11 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
 <div class="popup-overlay" id="popupMenu">
   <div class="popup-menu"> 
     <ul>
-    <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
+    <li><a href="login.php"><i class="fas fa-sign-in"></i> Giriş Yap</a></li>
     <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li>
 
    <!-- DARK MODE BUTTON -->
-      <li><button id="dark-mode-toggle">
+      <li><button id="dark-mode-toggle-mobile">
          <i class="fa-solid fa-moon"></i>
         </button>
 </li>
@@ -81,7 +87,7 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
   <main>    
     <div class="container">
       <h3 align="center" style="font-size: 32px;">Kayıt Ol</h3>
-      <form action="" method="post"> 
+      <form action="login.php" method="post"> 
         <div class="kadi-icon">
       <input type="text" name="username" id="kadi" placeholder="kullanıcı adınız..." style="width: 100%;" required> <i class="fa-solid fa-user"></i></div>
        <div class="email-icon"> 
@@ -147,17 +153,23 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Butona tıklanınca dark mode aç/kapat
-document.getElementById('dark-mode-toggle').addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
+document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode'); 
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
+document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode'); 
 
   if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('darkMode', 'enabled'); // aktif halde sakla
+    localStorage.setItem('darkMode', 'enabled');
   } else {
-    localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
+    localStorage.setItem('darkMode', 'disabled');
   }
-
-
 });
 function openPopup() {
   document.getElementById("popupMenu").style.display = "flex";
