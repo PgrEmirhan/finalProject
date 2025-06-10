@@ -364,7 +364,8 @@ body.dark-mode .hamburger{
     margin-left: 55px;
     box-shadow: none;
     width: 100%;
-  }     #dark-mode-toggle-desktop{
+  }     
+  #dark-mode-toggle-desktop{
     display: none; 
   }
 
@@ -449,6 +450,8 @@ body.dark-mode .hamburger{
     align-items: center;
     gap: 10px; 
     justify-content: center;
+            margin-right:40px;
+
   }
 
   footer { 

@@ -441,7 +441,8 @@ body.dark-mode .dropdown a:hover {
   }
   footer .footer-nav {
     flex-direction: column;
-    align-items: center;
+    align-items: center;        margin-right:40px;
+
   }
   footer .footer-nav ul {
     margin-bottom: 15px;

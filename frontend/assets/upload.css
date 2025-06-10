@@ -72,28 +72,54 @@ body.dark-mode .dropdown a {
 body.dark-mode .dropdown a:hover {
   background-color: #7c7c7c;
 }
-  body.dark-mode   #dark-mode-toggle{
-    width: 2rem;
-    height: 2rem;
-    border: 1px solid white;
-    border-radius: 100%;
-    font-size: 1.3rem;
-    background-color: transparent;
-    cursor: pointer;
-  }
-    body.dark-mode   .hamburger{
+     body.dark-mode   .hamburger{
     color: white;
   }
 
-  #dark-mode-toggle{
+  body.dark-mode #dark-mode-toggle-desktop{
     width: 2rem;
     height: 2rem;
-    border: 1px solid;
+    border: 2px solid rgb(255, 255, 255);
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
     border-radius: 100%;
     font-size: 1.3rem;
-    background-color: transparent;
     cursor: pointer;
   }
+    body.dark-mode #dark-mode-toggle-mobile{
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid rgb(0, 0, 0);
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    border-radius: 100%;
+    font-size: 1.3rem;
+    cursor: pointer;
+  margin-right: 20px;
+  }
+  #dark-mode-toggle-desktop
+{
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
+  border-radius: 100%;
+  font-size: 1.3rem;
+  background-color: rgb(255, 255, 255);
+  cursor: pointer;
+  }
+#dark-mode-toggle-mobile{
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
+  border-radius: 100%;
+  font-size: 1.3rem;
+  background-color: rgb(0, 0, 0);
+  cursor: pointer;
+  margin-right: 20px;
+}
+
         .nav-container{ 
             display: flex;
             justify-content: space-around;
@@ -592,7 +618,22 @@ margin-top: 5px;
     cursor: pointer;
 }
 /* Mobil ve küçük tabletler için */
-@media (max-width: 768px) {
+@media (max-width: 768px) {  .nav-container{
+    justify-content: space-evenly;  
+  }
+    .nav-container ul {
+    display: none; 
+  } 
+   #dark-mode-toggle-desktop{
+    display: none; 
+  }
+  
+
+
+   .hamburger {
+    display: block;
+    margin-right: 25px; 
+  } 
     .nav-links {
       display: none;
     }
@@ -602,11 +643,7 @@ margin-top: 5px;
     #avatarBtn,
     .dropdown {
       display: none;
-    }
-
-    .hamburger {
-      display: block;
-    }
+    } 
   /* Upload ve drop alanları */
   #drop-area,
   .upload-btn,
@@ -638,7 +675,8 @@ margin-top: 5px;
   .footer-nav {
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 10px;        margin-right:40px;
+
   }
 
   footer {

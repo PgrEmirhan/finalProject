@@ -522,8 +522,7 @@ function updateLogo() {
 // Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
 document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
-  updateLogo();
-
+ 
   if (document.body.classList.contains('dark-mode')) {
     localStorage.setItem('darkMode', 'enabled');
   } else {
@@ -533,8 +532,7 @@ document.getElementById('dark-mode-toggle-desktop').addEventListener('click', ()
 // Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
 document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
-  updateLogo();
-
+ 
   if (document.body.classList.contains('dark-mode')) {
     localStorage.setItem('darkMode', 'enabled');
   } else {

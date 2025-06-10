@@ -193,7 +193,7 @@ function updateLogo() {
   const logo = document.getElementById('logo');
   const isDarkMode = document.body.classList.contains('dark-mode');
   if (logo) {
-    logo.src = isDarkMode ? 'images/logo2.png' : 'images/logo.png';
+    logo.src = isDarkMode ? 'images/logo-1.png' : 'images/logo.png';
   }
 }
 

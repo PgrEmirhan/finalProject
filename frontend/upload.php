@@ -224,7 +224,7 @@ if (isset($_POST['delete_file'])) {
   <!-- NAV -->
   <nav class="nav-container">
     <a href="index.php">
-      <img src="images/logo.png" alt="Logo" style="width: 80px; margin-right: 111px;">
+      <img src="images/logo.png" alt="Logo" style="width: 80px; margin-right: 111px;" id="logo">
     </a>
 
     <!-- Normal Menü (büyük ekran) -->
@@ -232,10 +232,10 @@ if (isset($_POST['delete_file'])) {
       <li><a href="contact.php"><i class="fas fa-envelope icon"></i> İletişim</a></li>
 
     </ul>
+<button id="dark-mode-toggle-desktop">
+ <i class="fa-solid fa-moon"></i>
+</button>
 
-        <button id="dark-mode-toggle">
-      <i class="fa-solid fa-moon"></i>
-    </button>
     <!-- Dark Mode -->
 
     <!-- Gizli Profil İkonu -->
@@ -274,6 +274,11 @@ if (isset($_POST['delete_file'])) {
         <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a></li>
         <li><a href="archive.php"><i class="fa-solid fa-box"></i> Arşivlerim</a></li>
         <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a></li>
+        <li><button id="dark-mode-toggle-mobile">
+ <i class="fa-solid fa-moon"></i>
+</button>
+</li>
+
       </ul>
     </div>
   </div>
@@ -488,11 +493,34 @@ if (isset($_POST['delete_file'])) {
   if (isDarkMode === 'enabled') {
     document.body.classList.add('dark-mode');
   }
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
+function updateLogo() {
+  const logo = document.getElementById('logo');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  if (logo) {
+    logo.src = isDarkMode ? 'images/logo-1.png' : 'images/logo.png';
+  }
+}
 
-  document.getElementById('dark-mode-toggle').addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
-  });
+document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode'); 
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
+document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode'); 
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
+
 
   // Avatar dropdown
   const avatarBtn = document.getElementById('avatarBtn');

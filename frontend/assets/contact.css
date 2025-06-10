@@ -22,7 +22,7 @@
     background-color: black;
     color: rgb(255, 255, 255);
   } 
-  body.dark-mode .nav-container .logo{ 
+  body.dark-mode .nav-container #logo{ 
     color: rgb(255, 255, 255);
   }
   body.dark-mode .nav-container .fa-solid{ 
@@ -363,7 +363,7 @@ body.dark-mode .hamburger {
     color: rgb(7, 7, 255);
     text-decoration: underline;
   }
-#logo{
+#logo-container{
   margin-left: 15px;
 }
   footer {
@@ -548,6 +548,7 @@ body.dark-mode .hamburger {
     align-items: center;
     gap: 10px; 
     justify-content: center;
+            margin-right:40px;
   }
 
   footer { 

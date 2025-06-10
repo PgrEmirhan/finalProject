@@ -50,7 +50,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 <header>
 <!-- NAVIGATION BAR -->
 <nav class="nav-container">
-  <a href="index.php"><img src="images/logo.png" alt="" style="width: 80px;"></a>
+  <a href="index.php"><img src="images/logo.png" alt="" style="width: 80px;" id="logo"></a>
 
   <!-- NORMAL MENÜ (büyük ekranlar için) -->
   <ul class="nav-links">
@@ -162,7 +162,7 @@ function updateLogo() {
   const logo = document.getElementById('logo');
   const isDarkMode = document.body.classList.contains('dark-mode');
   if (logo) {
-    logo.src = isDarkMode ? 'images/logo2.png' : 'images/logo.png';
+    logo.src = isDarkMode ? 'images/logo-1.png' : 'images/logo.png';
   }
 }
 

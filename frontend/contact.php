@@ -33,8 +33,8 @@ if ($isLoggedIn) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <header> 
    <nav class="nav-container">
-    <a href="index.php" id="logo">
-      <img src="images/logo.png" alt="Logo" style="width: 80px;">
+    <a href="index.php" id="logo-container">
+      <img src="images/logo.png" alt="Logo" style="width: 80px;" id="logo">
     </a>
 <?php if (!$isLoggedIn): ?>
 
@@ -169,27 +169,36 @@ window.addEventListener('DOMContentLoaded', () => {
   if (isDarkMode === 'enabled') {
     document.body.classList.add('dark-mode');
   }
-});
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
 
-// Butona tıklanınca dark mode aç/kapat
+function updateLogo() {
+  const logo = document.getElementById('logo');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  if (logo) {
+    logo.src = isDarkMode ? 'images/logo-1.png' : 'images/logo.png';
+  }
+}
+
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
 document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
 
   if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('darkMode', 'enabled'); // aktif halde sakla
+    localStorage.setItem('darkMode', 'enabled');
   } else {
-    localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
+    localStorage.setItem('darkMode', 'disabled');
   }
-});  // Avatar dropdown
+});
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
 document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
 
   if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('darkMode', 'enabled'); // aktif halde sakla
+    localStorage.setItem('darkMode', 'enabled');
   } else {
-    localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
+    localStorage.setItem('darkMode', 'disabled');
   }
-});  // Avatar dropdown
+});
 
   const avatarBtn = document.getElementById('avatarBtn');
   const dropdown = document.getElementById('dropdownMenu');
@@ -223,6 +232,7 @@ document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () 
 
     } 
   });
+});
 
 
 </script>

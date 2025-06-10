@@ -77,24 +77,47 @@ body.dark-mode .dropdown a:hover {
   body.dark-mode footer span{ 
     color: white;
   } 
-  body.dark-mode   #dark-mode-toggle{
+    body.dark-mode #dark-mode-toggle-desktop{
     width: 2rem;
     height: 2rem;
-    border: 1px solid white;
+    border: 2px solid rgb(255, 255, 255);
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
     border-radius: 100%;
     font-size: 1.3rem;
-    background-color: transparent;
     cursor: pointer;
   }
-  #dark-mode-toggle{
+    body.dark-mode #dark-mode-toggle-mobile{
     width: 2rem;
     height: 2rem;
-    border: 1px solid;
+    border: 2px solid rgb(0, 0, 0);
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
     border-radius: 100%;
     font-size: 1.3rem;
-    background-color: transparent;
     cursor: pointer;
   }
+  #dark-mode-toggle-desktop
+{
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid rgb(0, 0, 0);
+  color: rgb(0, 0, 0);
+  border-radius: 100%;
+  font-size: 1.3rem;
+  background-color: rgb(255, 255, 255);
+  cursor: pointer;
+  }
+#dark-mode-toggle-mobile{
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
+  border-radius: 100%;
+  font-size: 1.3rem;
+  background-color: rgb(0, 0, 0);
+  cursor: pointer;
+}
         .nav-container{ 
             display: flex;
             justify-content: space-around;
@@ -312,7 +335,10 @@ body.dark-mode .dropdown a:hover {
     right: 20px;
     top: 20px;
     z-index: 999;
+  }  #dark-mode-toggle-desktop{
+    display: none; 
   }
+
 .file-list{
   width: 105%;
   text-align: center;
@@ -349,6 +375,7 @@ body.dark-mode .dropdown a:hover {
   footer .footer-nav {
     flex-direction: column; 
     margin-right: 10px;
+            margin-right:40px;
   }
   footer .footer-nav ul {
     margin-bottom: 15px;

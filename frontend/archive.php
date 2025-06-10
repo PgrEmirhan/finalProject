@@ -87,7 +87,7 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- NAV -->
 <nav class="nav-container">
   <a href="index.php">
-    <img src="images/logo.png" alt="Logo" style="width: 80px; margin-right: 111px;">
+    <img src="images/logo.png" alt="Logo" style="width: 80px; margin-right: 111px;" id="logo">
   </a>
 
   <!-- Normal Menü (büyük ekran) -->
@@ -95,7 +95,7 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <li><a href="contact.php"><i class="fas fa-envelope icon"></i> İletişim</a></li>
 
   </ul>
-       <button id="dark-mode-toggle">
+       <button id="dark-mode-toggle-desktop">
     <i class="fa-solid fa-moon"></i>
   </button>
 
@@ -130,7 +130,7 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a></li>
       <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a></li>
         <li>
-        <button id="dark-mode-toggle">
+        <button id="dark-mode-toggle-mobile">
         <i class="fa-solid fa-moon"></i>
         </button> 
       </li>
@@ -239,13 +239,42 @@ $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </footer>
 
 <script>
-  window.addEventListener('DOMContentLoaded', () => {
+ // Sayfa yüklendiğinde localStorage'dan dark mode'u kontrol et
+window.addEventListener('DOMContentLoaded', () => {
   const isDarkMode = localStorage.getItem('darkMode');
   if (isDarkMode === 'enabled') {
     document.body.classList.add('dark-mode');
   }
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
 
-      // Avatar dropdown
+function updateLogo() {
+  const logo = document.getElementById('logo');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  if (logo) {
+    logo.src = isDarkMode ? 'images/logo-1.png' : 'images/logo.png';
+  }
+}
+
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
+document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
+document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
   const avatarBtn = document.getElementById('avatarBtn');
   const dropdown = document.getElementById('dropdownMenu');
 

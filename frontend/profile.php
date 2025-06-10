@@ -36,14 +36,14 @@ $user = $stmt->fetch();
 <!-- NAV -->
 <nav class="nav-container">
   <a href="index.php">
-    <img src="images/logo.png" alt="Logo" style="width: 80px; margin-right: 111px;">
+    <img src="images/logo.png" alt="Logo" style="width: 80px; margin-right: 111px;" id="logo">
   </a>
 
   <!-- Normal Menü (büyük ekran) -->
   <ul class="nav-links">
     <li><a href="contact.php"><i class="fas fa-envelope icon"></i> İletişim</a></li> 
   </ul>
-    <button id="dark-mode-toggle">
+    <button id="dark-mode-toggle-desktop">
     <i class="fa-solid fa-moon"></i>
   </button>
 
@@ -77,7 +77,7 @@ $user = $stmt->fetch();
       <li><a href="archive.php"><i class="fa-solid fa-box"></i> Arşivlerim</a></li>
       <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a></li>
       <li>
-        <button id="dark-mode-toggle">
+        <button id="dark-mode-toggle-mobile">
         <i class="fa-solid fa-moon"></i>
         </button> 
       </li>
@@ -148,12 +148,41 @@ $user = $stmt->fetch();
         </footer>
       <script>
  // Sayfa yüklendiğinde localStorage'dan dark mode'u kontrol et
-window.addEventListener('DOMContentLoaded', () => {
+ document.addEventListener('DOMContentLoaded', () => {
+  // Dark mode kontrolü
   const isDarkMode = localStorage.getItem('darkMode');
   if (isDarkMode === 'enabled') {
     document.body.classList.add('dark-mode');
   }
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
+function updateLogo() {
+  const logo = document.getElementById('logo');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  if (logo) {
+    logo.src = isDarkMode ? 'images/logo-1.png' : 'images/logo.png';
+  }
+}
+
+document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode'); 
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
+  }
 });
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
+document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode'); 
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
+});
+
   // Avatar dropdown
   const avatarBtn = document.getElementById('avatarBtn');
   const dropdown = document.getElementById('dropdownMenu');
@@ -166,18 +195,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', function () {
     dropdown.style.display = 'none';
   });
-
-
-// Butona tıklanınca dark mode aç/kapat
-document.getElementById('dark-mode-toggle').addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-
-  if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('darkMode', 'enabled'); // aktif halde sakla
-  } else {
-    localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
-  }
-});   // Hamburger popup
+  // Hamburger popup
   // Hamburger popup
   function openPopup() {
     document.getElementById("popupMenu").style.display = "flex";
@@ -200,7 +218,6 @@ document.getElementById('dark-mode-toggle').addEventListener('click', () => {
       closePopup();
     }
   });
-
 
 </script>
 </body>
