@@ -48,6 +48,27 @@ if ($membership != 'free') {
         $params[] = (int)$_POST['max_size'];
     }
 }
+// Aylık üyelik için buton yazısı belirleme
+if ($membership === 'yearly') {
+    $monthly_button_text = "Aylık Üyeliğe Düşür";
+    $monthly_button_disabled = false;
+} elseif ($membership === 'monthly') {
+    $monthly_button_text = "Zaten Aylık Üyesiniz";
+    $monthly_button_disabled = true;
+} else {
+    $monthly_button_text = "Aylık Üyelik Al";
+    $monthly_button_disabled = false;
+}
+if ($membership === 'monthly') {
+    $yearly_button_text = "Yıllık Üyeliğe Yükselt";
+    $yearly_button_disabled = false;
+} elseif ($membership === 'yearly') {
+    $yearly_button_text = "Zaten Yıllık Üyesiniz";
+    $yearly_button_disabled = true;
+} else {
+    $yearly_button_text = "Yıllık Üyelik Al";
+    $yearly_button_disabled = false;
+}
 
 // Kullanıcının şu ana kadar yüklediği toplam dosya boyutunu al
 $stmt = $pdo->prepare("SELECT SUM(file_size) AS total_size FROM files WHERE user_id = ?");
@@ -430,7 +451,9 @@ if (isset($_POST['delete_file'])) {
       </ul>
       <form action="payment.php" method="POST">
   <input type="hidden" name="membership_type" value="monthly">
-  <button type="submit" class="satin-btn">Şimdi Yükselt</button>
+  <button type="submit" class="satin-btn"     <?= $monthly_button_disabled ? 'disabled title="Bu üyeliğe zaten sahipsiniz."' : '' ?>>
+    <?= $monthly_button_text ?>
+</button>
 </form>
     </div>
 
@@ -448,7 +471,8 @@ if (isset($_POST['delete_file'])) {
       </ul>
       <form action="payment.php" method="POST">
   <input type="hidden" name="membership_type" value="yearly">
-  <button type="submit" class="satin-btn">Şimdi Yükselt</button>
+  <button type="submit" class="satin-btn" <?= $yearly_button_disabled ? 'disabled title="Bu üyeliğe zaten sahipsiniz."' : '' ?>>
+    <?= $yearly_button_text ?></button>
 </form>
     </div>
 
@@ -480,7 +504,7 @@ if (isset($_POST['delete_file'])) {
         <a href="#"><h3>İLETİŞİM BİLGİLERİ </h3></a>
         <li><a href=""><b>Telefon: </b> +90 123 456 789
         </a></li>
-        <li><a href=""><b>Email: </b>tefsharing@gmail.com
+        <li><a href="mailto: "><b>Email: </b>tefsharing@gmail.com
         </a></li> 
         </ul>
     </div> 
@@ -504,6 +528,8 @@ function updateLogo() {
 
 document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode'); 
+    updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
+
   if (document.body.classList.contains('dark-mode')) {
     localStorage.setItem('darkMode', 'enabled');
   } else {
@@ -513,6 +539,7 @@ document.getElementById('dark-mode-toggle-desktop').addEventListener('click', ()
 // Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
 document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode'); 
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
 
   if (document.body.classList.contains('dark-mode')) {
     localStorage.setItem('darkMode', 'enabled');
