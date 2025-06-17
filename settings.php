@@ -143,17 +143,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <label>Eski Şifreniz:
       <input type="password" name="old_password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
          title="Parola en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir."
-         required>
+         required id="old">
     </label><br>
     <label>Yeni Şifreniz:
       <input type="password" name="new_password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
          title="Parola en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir."
-         required>
+         required id="new">
     </label><br>
     <label>Yeni Şifre (Tekrar):
       <input type="password" name="confirm_password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
          title="Parola en az 8 karakter olmalı, bir büyük harf, bir küçük harf, bir rakam ve bir özel karakter içermelidir."
-         required>
+         required id="nagain">
     </label><br>
     <button type="submit">Şifreyi Güncelle</button>
   </form>

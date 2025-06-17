@@ -152,8 +152,8 @@
               <?php foreach ($files as $file): ?>
               <li>
                   <strong><?= htmlspecialchars($file['file_name']) ?></strong>
-                  (<?= round($file['file_size'] / 1024, 2) ?> KB)<br>
-                  Yüklenme: <?= htmlspecialchars($file['uploaded_at']) ?><br> 
+                  (<?= round($file['file_size'] / 1024, 2) ?> KB) <br>  
+                  Yüklenme Tarihi: <?= htmlspecialchars($file['uploaded_at']) ?>  - 
                   <form method="POST" action="unarchives.php" style="display:inline;">
                       <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                       <input type="hidden" name="file_id" value="<?= $file['file_id'] ?>">

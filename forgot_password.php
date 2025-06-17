@@ -76,33 +76,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
   <link rel="stylesheet" href="assets/forgot.css?v=1">
   </head>
 <body>
-  <header>
-    <nav class="nav-container">
-      
-    <a href="index.php"><img src="images/logo.png" alt="" style="width: 80px; margin-top:0px; margin-right: 111px;"></a>
-      <ul>  
-        <li><a href="contact.php" style="margin-right: 1px;">         
-           <i class="fas fa-envelope icon"></i>
-          İletişim</a></li>
-      </ul>
-           <button id="dark-mode-toggle"> 
-         <i class="fa-solid fa-moon" ></i>
-      </button>  
-  </header>
+<header>
+<!-- NAVIGATION BAR -->
+<nav class="nav-container">
+  <a href="index.php"><img src="images/logo.png" alt="" style="width: 80px;" id="logo"></a>
+
+  <!-- NORMAL MENÜ (büyük ekranlar için) -->
+  <ul class="nav-links">
+<li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
+    <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li>
+  </ul>
+<button id="dark-mode-toggle-desktop">
+ <i class="fa-solid fa-moon"></i>
+</button>
+
+  <!-- HAMBURGER ICON (küçük ekranlar için) -->
+  <div class="hamburger" onclick="openPopup()">☰</div>
+</nav>
+
+<!-- POPUP MENÜ -->
+<div class="popup-overlay" id="popupMenu">
+  <div class="popup-menu"> 
+    <ul>
+<li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
+    <li><a href="contact.php"><i class="fa-solid fa-envelope"></i> İletişim</a></li>
+
+   <!-- DARK MODE BUTTON -->
+      <li><button id="dark-mode-toggle-mobile">
+         <i class="fa-solid fa-moon"></i>
+        </button>
+</li>
+    </ul>
+  </div>
+</div>
+</header>
   <main>
-    <h2>Parolanızı mı unuttunuz?</h2>
 
     <?php if ($message): ?>
         <p style="color: <?= strpos($message, '✔️') !== false ? 'green' : 'red' ?>;"><?= htmlspecialchars($message) ?></p>
     <?php endif; ?>
 
-    <form method="post" action="forgot_password.php">
+    <form method="post" action="forgot_password.php">   
+       <h2>Parolanızı mı unuttunuz?</h2>
+
          <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
         <label for="email">Kayıtlı E-posta Adresiniz:</label>
         <br>
-        <input type="email" name="email" required placeholder="ornek@mail.com">
+        <input type="email" name="email" required placeholder="ornek@mail.com" id="email">
         <br><br>
-        <input type="submit" value="Sıfırlama Linki Gönder">
+        <input type="submit" value="Sıfırlama Linki Gönder" id="btn">
     </form>
   </main>
        <footer>  
@@ -136,23 +158,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
             <p align="center">Tüm haklar saklıdır. TE-FS &copy2025</p>
         </footer>
         <script>
- // Sayfa yüklendiğinde localStorage'dan dark mode'u kontrol et
 window.addEventListener('DOMContentLoaded', () => {
   const isDarkMode = localStorage.getItem('darkMode');
   if (isDarkMode === 'enabled') {
     document.body.classList.add('dark-mode');
   }
-}); 
-// Butona tıklanınca dark mode aç/kapat
-document.getElementById('dark-mode-toggle').addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
+});
+
+function updateLogo() {
+  const logo = document.getElementById('logo');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  if (logo) {
+    logo.src = isDarkMode ? 'images/logo-1.png' : 'images/logo.png';
+  }
+}
+
+document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode'); 
+    updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
 
   if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('darkMode', 'enabled'); // aktif halde sakla
+    localStorage.setItem('darkMode', 'enabled');
   } else {
-    localStorage.setItem('darkMode', 'disabled'); // kapalı olarak sakla
+    localStorage.setItem('darkMode', 'disabled');
   }
-}); 
+});
+// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
+document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode'); 
+  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
+
+  if (document.body.classList.contains('dark-mode')) {
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    localStorage.setItem('darkMode', 'disabled');
+  }
+});
+
+function openPopup() {
+  document.getElementById("popupMenu").style.display = "flex";
+}
+
+function closePopup() {
+  document.getElementById("popupMenu").style.display = "none";
+}
+
+// Menü dışına tıklanınca popup kapanır
+window.addEventListener("click", function (e) {
+  const popup = document.getElementById("popupMenu");
+  const popupMenu = document.querySelector(".popup-menu");
+  const hamburger = document.querySelector(".hamburger");
+
+  // Eğer popup açıksa ve tıklama popup'ın içine veya hamburger ikonuna değilse kapat
+  if (popup.style.display === "flex" && !popupMenu.contains(e.target) && !hamburger.contains(e.target)) {
+    closePopup();
+  }
+});
+
 
 
 
