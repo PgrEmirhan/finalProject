@@ -1,15 +1,12 @@
 <?php
     session_start();
     require 'connect.php';
-    require 'csrf.php';
 
     if (!isset($_SESSION['user_id'])) {
         header("Location: login.php");
         exit();
     } 
-    if (isset($_POST['logout'])) {    
-      checkCsrfToken();  // logout işleminde de kontrol edelim
-
+    if (isset($_POST['logout'])) {
         session_unset();
         session_destroy();
         header("Location: login.php");
@@ -17,7 +14,8 @@
     }
     
     $user_id = $_SESSION['user_id'];   
-    $username = $_SESSION['user_name']; 
+    $username = $_SESSION['user_name'];
+
 $avatar = null;
 
 $query = $pdo->prepare("SELECT * FROM users WHERE user_id = ?");
@@ -202,7 +200,7 @@ if (isset($_POST['delete_file'])) {
             }
         }
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['shareform'])) {
         // Alınan veriler
         $recipientEmail = $_POST['recipient'];
         $fileLink = $_POST['file_link'];
@@ -217,7 +215,6 @@ if (isset($_POST['delete_file'])) {
         $headers .= "From: no-reply@domain.com" . "\r\n"; // Gönderen e-posta adresi
 
         // E-posta gönderme
-        
         if (mail($recipientEmail, $subject, $message, $headers)) {
             echo "Dosya başarıyla paylaşıldı!";
         } else {
@@ -230,7 +227,6 @@ if (isset($_POST['delete_file'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="csrf-token" content="<?= $_SESSION['csrf_token'] ?? '' ?>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dosya Yükle</title>
@@ -248,7 +244,7 @@ if (isset($_POST['delete_file'])) {
   <header>
   <!-- NAV -->
   <nav class="nav-container">
-    <a href="index.php" onclick="backIndex()">
+    <a href="#">
       <img src="images/logo.png" alt="Logo" style="width: 80px; margin-right: 111px;" id="logo">
     </a>
 
@@ -325,36 +321,33 @@ if (isset($_POST['delete_file'])) {
         </div>
         <br>
 
-<form id="uploadForm" action="upload.php" method="POST" enctype="multipart/form-data" style="display:none;">
-    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-    <input type="file" name="file" id="fileInput" />
-</form>
+        <form id="uploadForm" action="upload.php" method="POST" enctype="multipart/form-data" style="display:none;">
+            <input type="file" name="file" id="fileInput" />
+        </form>
+
         <button class="upload-btn" onclick="uploadFile()">Dosya Yükle</button>
         <?php if ($membership!=='free'):?>
-<form id="filterForm" method="POST" action="upload.php">
-    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-    <h3>Filtreleme</h3>
-    <label>Tür (uzantı, örn: txt, pdf):</label>
-    <input type="text" name="type" id="type" value="<?= htmlspecialchars($_POST['type'] ?? '') ?>">
-    <br>
-    <label>Minimum Boyut (bayt):</label>
-    <input type="number" id="min-size" name="min_size" value="<?= htmlspecialchars($_POST['min_size'] ?? '') ?>">
-    <br>
-    <label>Maksimum Boyut (bayt):</label>
-    <input type="number" name="max_size" id="max-size" value="<?= htmlspecialchars($_POST['max_size'] ?? '') ?>">
-    <br>
-    <input type="submit" value="Filtrele" id="filter-btn">
-    <button id="showAllBtn">Hepsini Getir</button>
-</form>    
-<?php endif; ?>
+        <form id="filterForm" method="POST" action="upload.php">
+        <h3>Filtreleme</h3>
+        <label>Tür (uzantı, örn: txt, pdf):</label>
+        <input type="text" name="type" id="type" value="<?= htmlspecialchars($_POST['type'] ?? '') ?>">
+        <br>
+        <label>Minimum Boyut (bayt):</label>
+        <input type="number" id="min-size" name="min_size" value="<?= htmlspecialchars($_POST['min_size'] ?? '') ?>">
+        <br>
+        <label>Maksimum Boyut (bayt):</label>
+        <input type="number" name="max_size" id="max-size" value="<?= htmlspecialchars($_POST['max_size'] ?? '') ?>">
+        <br>
+        <input type="submit" value="Filtrele" id="filter-btn">
+        <button id="showAllBtn">Hepsini Getir</button>
+    </form><br><br>
+    <?php endif; ?>
 
 
-<br>
-<br>
-<div class="file-list">
-  <h3>Yüklediğiniz Dosyalar:</h3>
-<form id="archiveForm" method="POST" action="archive.php">
-    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+<br><br>
+        <div class="file-list">
+            <h3>Yüklediğiniz Dosyalar:</h3>
+          <form id="archiveForm" method="POST" action="archive.php">
     <?php if (count($files) > 0): ?>
         <?php foreach ($files as $file): ?>
             <div>
@@ -365,16 +358,16 @@ if (isset($_POST['delete_file'])) {
                 <?= htmlspecialchars($file['file_name']) ?> (<?= $file['file_size'] ?> bayt)          
                 </label>
 
-                <!-- İndir -->
-                <a href="uploads/<?= basename($file['file_path']) ?>" download>
-                    <button type="button">İndir</button>
-                </a>
-                <button type="button" onclick="if(confirmDelete(<?= $file['file_id']; ?>)){ window.location='upload.php?delete_file=<?= $file['file_id']; ?>'; }">
-                  Sil
-                </button>
-                <button type="button" onclick="openShareModal('<?= addslashes(htmlspecialchars(basename($file['file_path']))) ?>');">
-                    Paylaş
-                </button>
+        <!-- İndir -->
+        <a href="uploads/<?= basename($file['file_path']) ?>" download>
+            <button type="button">İndir</button>
+        </a>|
+        <button type="button" onclick="if(confirmDelete(<?= $file['file_id']; ?>)){ window.location='upload.php?delete_file=<?= $file['file_id']; ?>'; }">
+          Sil
+        </button>|
+            <button type="button" onclick="openShareModal('<?= addslashes(htmlspecialchars(basename($file['file_path']))) ?>');">
+                Paylaş
+            </button>
             </div>
         <?php endforeach; ?>
         <br>
@@ -385,51 +378,54 @@ if (isset($_POST['delete_file'])) {
         <p>Henüz dosya yüklemediniz.</p>
     <?php endif; ?>
 </form>
+
         </div>
 <!-- Modal -->
  <!-- Arka plan bulanıklaştırma için Overlay -->
 <div id="overlay"></div>
 <div id="shareModal" style="display:none; position:fixed; top:20%; left:35%; width:30%; background:white; padding:20px; border:1px solid #ccc; z-index:1000;">
     <h3>Paylaşım Ayarları</h3>
-<form id="shareForm" action="shareFile.php" method="POST">
-    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-    <div class="form-group">
-        <!-- Paylaşım Türü -->
-        <label for="shareType">Paylaşım Türü:</label>
-        <select id="shareType" name="shareType" required onchange="toggleShareOptions()">
-            <option value="public">Genel</option>
-            <option value="private">Özel</option>
-        </select>
-    </div>
-    <!-- Hidden input for file ID -->
-    <input type="hidden" name="file_id" id="modalFileId"> 
-    <!-- Parola (sadece özel paylaşımda gösterilecek) -->
-    <div id="passwordField" style="display: none;">
-        <label>Parola (isteğe bağlı): </label><br>
-        <input type="text" name="password"><br><br>
-    </div>
+    <form id="shareForm" name="shareform" action="shareFile.php" method="POST">
+        <div class="form-group">
+<!-- Paylaşım Türü -->
+<label for="shareType">Paylaşım Türü:</label>
+<select id="shareType" name="shareType" required onchange="toggleShareOptions()">
+    <option value="public">Genel</option>
+    <option value="private">Özel</option>
+</select>
+        </div>
+         <!-- Hidden input for file ID -->
+        <input type="hidden" name="file_id" id="modalFileId"> 
+<!-- Parola (sadece özel paylaşımda gösterilecek) -->
+<div id="passwordField" style="display: none;">
+    <label>Parola (isteğe bağlı): </label><br>
+    <input type="text" name="password"><br><br>
+</div>
 
-    <!-- Geçerlilik Süresi -->
-    <label>Geçerlilik süresi (gün):</label><br>
-    <input type="number" name="expiry_days" min="1" value="7"><br><br>
+<!-- Geçerlilik Süresi -->
+        <label>Geçerlilik süresi (gün):</label><br>
+        <input type="number" name="expiry_days" min="1" value="7"><br><br>
 
-    <!-- Max indirme sayısı -->
-    <label>Max indirme sayısı (isteğe bağlı):</label><br>
-    <input type="number" name="max_downloads" min="1"><br><br>
+        <!-- Max indirme sayısı -->
+        <label>Max indirme sayısı (isteğe bağlı):</label><br>
+        <input type="number" name="max_downloads" min="1"><br><br>
 
-    <!-- Paylaşılacak Link -->
-    <label>Paylaşım Linki:</label><br>
-    <input type="text" id="shareLink" name="shareLink" placeholder="Paylaşılacak dosya linki" required readonly />
-    <button type="button" id="copyBtn" onclick="copyLink()">Kopyala</button><br><br>
+        <!-- Paylaşılacak Link -->
+        <label>Paylaşım Linki:</label><br>
+        <input type="text" id="shareLink" name="shareLink" placeholder="Paylaşılacak dosya linki" required readonly />
+        <button type="button" id="copyBtn" onclick="copyLink()">Kopyala</button><br><br>
 
-    <!-- Her zaman görünecek -->
-    <label>Paylaşılacak Kişinin E-Postası:</label><br>
-    <input type="email" id="recipient" name="recipient" placeholder="Kullanıcı e-posta adresi" required><br><br>
+<!-- Her zaman görünecek -->
+<label>Paylaşılacak Kişinin E-Postası:</label><br>
+<input type="email" id="recipient" name="recipient" placeholder="Kullanıcı e-posta adresi" required><br><br>
 
-    <!-- Submit ve İptal Butonları -->
-    <button type="submit">Paylaş</button>
-    <button type="button" onclick="closeModal()">İptal</button>
-</form>
+        <!-- Submit ve İptal Butonları -->
+        <button onclick="openShareModal(
+    '<?php echo basename($file['file_path']); ?>',
+    '<?php echo $file['file_id']; ?>'
+    )">Paylaş</button>
+        <button type="button" onclick="closeModal()">İptal</button>
+    </form>
 </div>
  
     </div>
@@ -453,12 +449,12 @@ if (isset($_POST['delete_file'])) {
         <li><i class="fa-solid fa-check"></i> Şifreli paylaşım bağlantıları oluşturma</li>
         <li><i class="fa-solid fa-check"></i> Hızlı geri bildirim destek hattı</li>
       </ul>
-    <form action="payment.php" method="POST">
-    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-    <input type="hidden" name="membership_type" value="monthly">
-    <button type="submit" class="satin-btn" <?= $monthly_button_disabled ? 'disabled title="Bu üyeliğe zaten sahipsiniz."' : '' ?>>
-        <?= $monthly_button_text ?>
-    </button>
+      <form action="payment.php" method="POST">
+  <input type="hidden" name="membership_type" value="monthly">
+  <button type="submit" class="buy-btn"     
+  <?= $monthly_button_disabled ? 'disabled title="Bu üyeliğe zaten sahipsiniz."' : '' ?>>
+    <?= $monthly_button_text ?>
+</button>
 </form>
     </div>
 
@@ -474,10 +470,9 @@ if (isset($_POST['delete_file'])) {
         <li><i class="fa-solid fa-check"></i> Şifreli paylaşım bağlantıları oluşturma</li>
         <li><i class="fa-solid fa-check"></i> Reklamsız şekilde dosya yükleme ve paylaşım</li> 
       </ul>
-      <form action="payment.php" method="POST">    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-
+      <form action="payment.php" method="POST">
   <input type="hidden" name="membership_type" value="yearly">
-  <button type="submit" class="satin-btn" <?= $yearly_button_disabled ? 'disabled title="Bu üyeliğe zaten sahipsiniz."' : '' ?>>
+  <button type="submit" class="buy-btn" <?= $yearly_button_disabled ? 'disabled title="Bu üyeliğe zaten sahipsiniz."' : '' ?>>
     <?= $yearly_button_text ?></button>
 </form>
     </div>
@@ -553,6 +548,18 @@ document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () 
     localStorage.setItem('darkMode', 'disabled');
   }
 });
+  const logoLink = document.getElementById("logo");
+
+  if (logoLink) {
+    logoLink.addEventListener("click", function (e) {
+      e.preventDefault(); // normal yönlendirmeyi durdur
+
+      const confirmLogout = confirm("Çıkış yapmak istediğinize emin misiniz?");
+      if (confirmLogout) {
+        window.location.href = "logout.php?redirect=index.php";
+      }
+    });
+  }
 
 
   // Avatar dropdown
@@ -603,11 +610,6 @@ document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () 
 
   document.querySelector('.upload-btn')?.addEventListener('click', uploadFile);
 
-// Diğer fonksiyonlar (DOMContentLoaded dışında olabilir):
-function triggerFileInput() {
-  document.getElementById('fileInput').click();
-}
-
   function uploadFile() {
     if (filesToUpload.length === 0) {
       alert("Lütfen bir dosya seçin.");
@@ -619,10 +621,6 @@ function triggerFileInput() {
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "upload.php", true);
-
-// CSRF token ekle
-const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-formData.append("csrf_token", csrfToken);
 
     xhr.upload.addEventListener("progress", updateProgressBar, false);
 
@@ -655,7 +653,6 @@ formData.append("csrf_token", csrfToken);
     const recipient = document.getElementById("recipient").value;
     const shareLink = document.getElementById("shareLink").value;
     const file_id = document.getElementById("modalFileId").value;
-const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
     const data =
       "recipient=" + encodeURIComponent(recipient) +
@@ -692,12 +689,12 @@ const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute
   });
 
 });
-function backIndex(){
-  confirm("Ana sayfaya geçmek için hesabınızdan çıkmak istediğinize emin misiniz?"); 
-session_destroy();
-session_unset();
-header("Location: index.php");
+
+// Diğer fonksiyonlar (DOMContentLoaded dışında olabilir):
+function triggerFileInput() {
+  document.getElementById('fileInput').click();
 }
+
 function openShareModal(fileName, fileId) {
   if (fileName) {
     const shareLink = "http://localhost/finalProject/Frontend/uploads/" + fileName;
@@ -716,9 +713,6 @@ function confirmDelete(fileId) {
           const formData = new FormData();
         formData.append('delete_file', fileId);
         
-// CSRF token ekle
-const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-formData.append("csrf_token", csrfToken);
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'upload.php', true);
         xhr.onload = function () {

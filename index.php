@@ -227,7 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['share_file'])) {
         </form>
         <?php endforeach; ?>
 
-                </div> <br>
+                </div> <br><br>
             <h2 align="center" class="cards-title"><i class="fas fa-check-circle"></i>
             Neden bizi tercih etmelisiniz?</h2>
             <div class="cards">
@@ -235,7 +235,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['share_file'])) {
                 align-items: center; justify-content: center;"></i> 
                 <h3 align="center">Kolay ve Hızlı Dosya Paylaşımı
                 </h3>
-                <p align="center">Dosya paylaşımı hiç bu kadar kolay olmamıştı! Sadece birkaç tıklama ile dosyalarınızı yükleyin, özelleştirin ve başkalarıyla paylaşın. Sürükle-bırak yöntemi ile dosyalarınızı kolayca yükleyebilir ve paylaşabilirsiniz. Sistemimiz, her türlü dosya türünü destekler ve size güvenli, hızlı bir paylaşım deneyimi sunar.
+                <p align="center"><strong>Dosya paylaşımını hiç bu kadar kolay görmediniz!</strong><br>
+                Sistemimizle, sürükle-bırak yöntemi ile tek tıkla dosya yükleyebilir ve başkalarıyla hızlıca paylaşabilirsiniz. Bir dosya yüklemek, sadece birkaç saniye sürer. Her türlü dosya türünü destekliyoruz ve güvenli bir aktarım sağlıyoruz. 
                 </p>
             </div>
             <div class="card2">
@@ -243,7 +244,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['share_file'])) {
                 align-items: center; justify-content: center;"></i>
                 <h3 align="center">Misafir Kullanıcılar için Ücretsiz Yükleme
                 </h3>
-                <p align="center">Hesap oluşturmanıza gerek yok! Misafir kullanıcılar da dosyalarını yükleyebilir, 24 saat boyunca kalıcı olacak şekilde paylaşabilir ve özelleştirebilirler. 24 saat sonunda dosyanız otomatik olarak silinir, ancak üyelik ile dosyalarınızı süresiz tutabilirsiniz.
+                <p align="center"><strong>Üye olmadan dosya yükleme imkanı!</strong><br>
+Misafir kullanıcılar, herhangi bir üyelik oluşturmak zorunda kalmadan dosyalarını yükleyebilir. Yükledikleri dosyalar 24 saat boyunca aktif kalır. Ücretsiz dosya saklama ve gelişmiş özelliklere erişim için basit ve hızlı bir çözüm! 
+
+
                 </p>
             </div>
             <div class="card3"> 
@@ -251,7 +255,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['share_file'])) {
                 align-items: center; justify-content: center;"></i>
                 <h3 align="center">Süresiz Dosya Saklama ve Ekstra Özellikler
                 </h3>
-                <p align="center">Üye olduğunuzda, dosyalarınızın süresiz olarak saklanması sağlanır. Ayrıca, indir, sil ve paylaş gibi ek özelliklere erişebilirsiniz. Üyeler ayrıca dosyalarına özel linkler oluşturabilir ve paylaşabilir. Hesabınızla, her zaman kontrol sizde olur!
+                <p align="center"><strong>Dosyalarınızı tek bir panelde yönetin.</strong><br>
+                Üyeler, kendi özel kullanıcı panellerine sahip olur. Buradan dosyalarınızı görüntüleyebilir, düzenleyebilir ve yönetebilirsiniz. Ayrıca profil ayarları, dosya arşivleme ve özelleştirilmiş paylaşımlar yapabilirsiniz.
                 </p>
             </div>
             <div class="card4">
@@ -259,32 +264,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['share_file'])) {
                 align-items: center; justify-content: center"></i>
                 <h3 align="center">Premium Üyelikle Daha Fazla Avantaj
                 </h3>
-                <p align="center">Premium üyelik ile dosya paylaşımını bir üst seviyeye taşıyın. Premium kullanıcılar, daha yüksek dosya yükleme limitlerine, özel dosya özelleştirme seçeneklerine ve sınırsız indirme hızına sahip olacaklar. Dosyalarınız her zaman güvende olacak ve sadece siz yönetebileceksiniz.
+                <p align="center"><strong>Dosyalarınızı istediğiniz kadar saklayın ve yönetin!</strong><br>
+Aylık ve yıllık üyelik seçeneklerimiz, size dosya yönetiminde tam kontrol sağlar. Üye olarak, dosyalarınızı süresiz saklayabilir ve istediğiniz zaman erişebilirsiniz.
                 </p>
             </div>
             </div> 
             <h2 align="center" style="font-size: 32px; margin-top: 35px;"><i class="fas fa-cogs"></i>
             Sistemimizin Çalışma Prensibi</h2>
             <div class="system-articles">
-            <p> <b>Misafir Kullanıcılar:</b> Üyelik gerektirmeden dosyalarınızı yükleyebilirsiniz. 24 saat boyunca dosyanız aktif olacak ve istediğiniz zaman indirebilirsiniz. 
-            </p>
-            <p> <b> Üyelik Sistemi: </b>Üye olarak daha fazla avantaj elde edin! Süresiz dosya saklama, dosyalarınız üzerinde tam kontrol ve çok daha fazlası.</p>
-            <p>  <b>Premium Özellikler: </b>Premium üyelikle dosya boyutu limitlerini aşabilir, dosya özelleştirme ve paylaşım seçeneklerini en üst seviyeye çıkarabilirsiniz.</p>
-            <ul>
-                <li>Kullanıcı Dostu Arayüz
-                Uygulamamız, kullanıcı dostu bir arayüze sahiptir. Basit sürükle-bırak yöntemi ile dosyalarınızı yükleyebilir ve çok kısa sürede paylaşmaya başlayabilirsiniz. Ayrıca, dosya yönetimi çok kolaydır; yükledikten sonra her zaman dosyalarınızı indirebilir, silebilir veya yeni kullanıcılarla paylaşabilirsiniz.</li>
-            <li>        
-                Güvenli ve Hızlı
-                Verilerinizin güvenliği bizim için çok önemli. Dosyalarınız en yüksek güvenlik önlemleriyle saklanır ve yalnızca sizin belirlediğiniz kişilerle paylaşılır. Ayrıca, dosya yükleme ve indirme hızları oldukça hızlıdır, böylece zaman kaybetmeden işlemlerinizi gerçekleştirebilirsiniz.</p>
-            </li></ul>
-                <b>Hangi Üyelik Sizin İçin Uygun?</b>
-        <br>
-        <ul><li><b>Aylık Üyelik:</b> Eğer kısa vadede tüm premium özelliklerden yararlanmak istiyorsanız, aylık üyelik tam size göre.
-        </li>
-        <li><b>Yıllık Üyelik:</b> Uzun vadeli bir çözüm arıyorsanız, yıllık üyelikle hem daha fazla avantaj elde edebilir hem de ödeme konusunda tasarruf sağlayabilirsiniz.
-        </li>
-        <li><b>Özel Premium (Takım/İşletme): </b>Eğer birden fazla kişiye dosya paylaşımı yapmanız gerekiyorsa veya işletmenizin özel ihtiyaçları varsa, özel premium üyelik sizin biçin ideal.</li>
-        </ul>
+Sistemimiz, kullanıcılarımıza kolay ve güvenli dosya paylaşımı imkanı sunan bir platformdur. Misafir kullanıcılar, herhangi bir üyelik gerektirmeden dosya yükleyebilir ve bu dosyaları başkalarıyla paylaşabilir. Yükledikleri dosyalar, 24 saat boyunca aktif kalır ve hızlı bir şekilde paylaşım yapılabilir. Bu, acil dosya paylaşımı yapanlar için ideal bir çözüm sunar. Ancak, üye kullanıcılar için daha fazla avantaj bulunmaktadır. Üyelik sayesinde dosyalarınız süresiz olarak saklanır ve istediğiniz zaman erişebilirsiniz. Ayrıca, üyeler kendilerine özel bir kullanıcı paneline sahip olur ve burada tüm dosyalarını kolayca yönetebilir. Bu panel üzerinden dosyalarınızı filtreleyebilir, arşivleyebilir ve daha düzenli bir şekilde saklayabilirsiniz. <br>
+
+Üye olarak, dosya paylaşımınızı da daha güvenli ve kişiselleştirilmiş hale getirebilirsiniz. Örneğin, belirli e-posta adreslerine özel dosya paylaşımları yapabilir, dosyalarınıza parola koruması ekleyebilir ve geçerlilik süresi belirleyebilirsiniz. Bu özellikler, dosyalarınızın sadece belirli kişilerle paylaşılmasını ve güvenli bir şekilde kontrol edilmesini sağlar. Ayrıca, üyeler gelişmiş paylaşım seçenekleri ve dosya yönetim araçlarına da erişim sağlar. Böylece, dosyalarınızı daha verimli bir şekilde organize edebilir ve paylaşım sürecini daha pratik hale getirebilirsiniz.
 
             </p>
             </div>
@@ -357,8 +347,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['share_file'])) {
   <div class="premium-advantages">
     <p align="left">
       <i class="fas fa-gem"></i>
-      <b>Neden Premium Olmalısınız?</b><br><br>
-      Premium üyelik ile dosyalarınızı daha güvenli, daha hızlı ve daha esnek bir şekilde yönetebilirsiniz. Reklamsız kullanım, özel paylaşım seçenekleri, daha büyük dosya limitleri ve öncelikli teknik destek gibi ayrıcalıklardan faydalanarak deneyiminizi en üst seviyeye çıkarabilirsiniz. Gelişmiş güvenlik, kişisel gizlilik ayarları ve profesyonel kullanım imkanı ile dijital dünyada fark yaratın.
+      <b>Neden Üyeliğe Geçmelisiniz?</b><br><br>
+Üyelik, dosya paylaşımını ve yönetimini çok daha kolay ve güvenli hale getirir. İşte üyeliğinizle elde edeceğiniz avantajlar:
+
+Süresiz Dosya Saklama: Yüklediğiniz dosyalar sürekli olarak saklanır, dilediğiniz zaman erişebilirsiniz.
+
+Kişisel Kullanıcı Paneli: Dosyalarınızı tek bir yerden yönetebilir, düzenleyebilir ve özelleştirebilirsiniz.
+
+Gelişmiş Paylaşım Seçenekleri: Dosyalarınızı belirli e-posta adreslerine özel paylaşabilir, parola koruması ve geçerlilik süresi gibi güvenlik önlemleri alabilirsiniz.
+
+Filtreleme ve Arşivleme: Yüklediğiniz dosyaları daha verimli bir şekilde filtreleyebilir ve arşivleyebilirsiniz.
+
+Kolay Yönetim: Kullanıcı paneliniz üzerinden tüm dosyalarınızı hızlıca erişebilir ve yönetebilirsiniz.
+
+Üyelik, hem dosya güvenliği hem de dosya yönetimini daha verimli hale getirir. Hızlı, kolay ve güvenli dosya paylaşımı ve yönetimi için şimdi üye olun!
+
     </p>
   </div>
   <br>

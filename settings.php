@@ -259,8 +259,18 @@ document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () 
     localStorage.setItem('darkMode', 'disabled');
   }   
 });
-      // Avatar dropdown
-  const avatarBtn = document.getElementById('avatarBtn');
+ const logoLink = document.getElementById("logo");
+
+  if (logoLink) {
+    logoLink.addEventListener("click", function (e) {
+      e.preventDefault(); // normal yönlendirmeyi durdur
+
+      const confirmLogout = confirm("Çıkış yapmak istediğinize emin misiniz?");
+      if (confirmLogout) {
+        window.location.href = "logout.php?redirect=index.php";
+      }
+    });
+  }  const avatarBtn = document.getElementById('avatarBtn');
   const dropdown = document.getElementById('dropdownMenu');
 
   avatarBtn.addEventListener('click', function (e) {

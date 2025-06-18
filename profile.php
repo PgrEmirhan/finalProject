@@ -186,7 +186,18 @@ document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () 
   }
 });
 });
+ const logoLink = document.getElementById("logo");
 
+  if (logoLink) {
+    logoLink.addEventListener("click", function (e) {
+      e.preventDefault(); // normal yönlendirmeyi durdur
+
+      const confirmLogout = confirm("Çıkış yapmak istediğinize emin misiniz?");
+      if (confirmLogout) {
+        window.location.href = "logout.php?redirect=index.php";
+      }
+    });
+  }
   // Avatar dropdown
   const avatarBtn = document.getElementById('avatarBtn');
   const dropdown = document.getElementById('dropdownMenu');

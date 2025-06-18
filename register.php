@@ -91,8 +91,8 @@ if (isset($_POST['username']) && isset($_POST['password']) && isset($_POST['emai
       <h3 align="center" style="font-size: 32px;">Kayıt Ol</h3>
       <form action="" method="post"> 
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-        <div class="kadi-icon">
-      <input type="text" name="username" id="kadi" placeholder="kullanıcı adınız..." style="width: 100%;" pattern="^[a-zA-Z0-9._]{1,30}$"
+        <div class="uname-icon">
+      <input type="text" name="username" id="uname" placeholder="kullanıcı adınız..." style="width: 100%;" pattern="^[a-zA-Z0-9._]{1,30}$"
                 title="Kullanıcı adı yalnızca harf, rakam, nokta (.) ve alt çizgi (_) içerebilir. Boşluk karakteri kullanılamaz." 
                 required> 
       <i class="fa-solid fa-user"></i></div>

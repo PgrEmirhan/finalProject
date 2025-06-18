@@ -34,19 +34,22 @@ if ($isLoggedIn) {
     </a>
   <?php if (!$isLoggedIn): ?>
 
+
+
     <!-- Normal Menü (büyük ekran) -->
     <ul class="nav-links">
     <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
     <li><a href="login.php"><i class="fas fa-sign-in"></i> Giriş Yap</a></li> 
     </ul>
-
-        <button id="dark-mode-toggle-desktop">
+    <button id="dark-mode-toggle-desktop">
       <i class="fa-solid fa-moon"></i>
     </button> 
-
     <!-- Hamburger Menü (mobil) -->
   <div class="hamburger" onclick="openPopup()">☰</div>
   </nav>
+       <button id="dark-mode-toggle-desktop">
+    <i class="fa-solid fa-moon"></i>
+  </button>
 
   <!-- Mobil Popup Menü -->
   <div class="popup-overlay" id="popupMenu">
@@ -55,17 +58,20 @@ if ($isLoggedIn) {
       <ul>
     <li><a href="register.php"><i class="fas fa-user-plus icon"></i> Üye Ol</a></li>
     <li><a href="contact.php"><i class="fas fa-sign-in"></i> Giriş Yap</a></li> 
-        <li> <button id="dark-mode-toggle-mobile">
+        <li> <button id="dark-mode-toggle-mobile">   
+           <i class="fa-solid fa-moon"></i> 
+        </button>
+  </li>
+  </div>
+     <?php endif; ?>
+<?php if ($isLoggedIn): ?> 
+      
+    <!-- Normal Menü (büyük ekran) -->
+    <ul class="nav-links"> 
+</ul>        <button id="dark-mode-toggle-desktop">
       <i class="fa-solid fa-moon"></i>
     </button> 
-</li>
-       </ul>
-    </div>
-  </div>
-
-     <?php endif; ?>
-<?php if ($isLoggedIn): ?>
-
+ 
     <!-- Avatar Butonu -->
     <button id="avatarBtn">
       <?php if ($avatar): ?>
@@ -80,11 +86,7 @@ if ($isLoggedIn) {
       <a href="profile.php"><i class="fa-solid fa-user"></i> Profilim</a>
       <a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a>
       <a href="archive.php"><i class="fa-solid fa-box"></i> Arşivlerim</a>
-      <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a>
-              <li> <button id="dark-mode-toggle-mobile">
-      <i class="fa-solid fa-moon"></i>
-    </button> 
-</li>
+      <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a>  
     </div>
 
     <!-- Hamburger Menü (mobil) -->
@@ -101,15 +103,14 @@ if ($isLoggedIn) {
         <li><a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a></li>
         <li><a href="archive.php"><i class="fa-solid fa-box"></i> Arşivlerim</a></li>
         <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a></li>
-                <li> <button id="dark-mode-toggle-mobile">
+        <li> <button id="dark-mode-toggle-mobile">
       <i class="fa-solid fa-moon"></i>
     </button> 
 </li>
       </ul>
     </div>
-  </div>
-
-  <?php endif; ?>
+  </div>  
+  <?php endif; ?> 
   </header>
   <main>    
     <div class="container">
@@ -121,12 +122,16 @@ if ($isLoggedIn) {
         <div class="kadi-icon">
       <input type="text" name="email" id="email" placeholder="mail adresiniz..." style="width: 100%;"> <i class="fa-solid fa-envelope"></i></div>
         <div>
-        <textarea name="message" id="message" cols="54" rows="6" placeholder="mesajınız..."></textarea>
+        <textarea name="message" id="message" cols="52" rows="6" placeholder="mesajınız..."></textarea>
         </div>
           <input type="submit" value="Gönder" id="gonder-btn">
           <p align="center"> * Tekrar eden mesajlar spama düşecektir *  </p>
-        </form> 
+        </form> <?php if ($isLoggedIn): ?> 
+    <a href="upload.php" class="back-link"><i class="fa-solid fa-arrow-left"></i> Yükleme Sayfasına Dön</a>
+<?php endif;?>  
     </div>
+    <br>
+
   </main>
         <footer>  
         <div class="footer-nav"> 
@@ -160,44 +165,66 @@ if ($isLoggedIn) {
         </footer> 
     <script>   
  // Sayfa yüklendiğinde localStorage'dan dark mode'u kontrol et
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
+  // Dark mode kontrolü
   const isDarkMode = localStorage.getItem('darkMode');
   if (isDarkMode === 'enabled') {
     document.body.classList.add('dark-mode');
   }
   updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
 
-function updateLogo() {
-  const logo = document.getElementById('logo');
-  const isDarkMode = document.body.classList.contains('dark-mode');
-  if (logo) {
-    logo.src = isDarkMode ? 'images/logo-1.png' : 'images/logo.png';
+  // Logo güncelleme fonksiyonu
+  function updateLogo() {
+    const logo = document.getElementById('logo');
+    const isDark = document.body.classList.contains('dark-mode');
+    if (logo) {
+      logo.src = isDark ? 'images/logo-1.png' : 'images/logo.png';
+    }
   }
-}
 
-// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
-document.getElementById('dark-mode-toggle-desktop').addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
+  // Dark mode butonuna tıklama işlemi
+  const darkModeDesktopBtn = document.getElementById('dark-mode-toggle-desktop');
+  const darkModeMobileBtn = document.getElementById('dark-mode-toggle-mobile');
 
-  if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('darkMode', 'enabled');
-  } else {
-    localStorage.setItem('darkMode', 'disabled');
+  // Eğer butonlar varsa, event listener'ları ekle
+  if (darkModeDesktopBtn) {
+    darkModeDesktopBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      updateLogo(); // Sayfa yüklendiğinde logoyu güncelle
+
+      if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('darkMode', 'enabled');
+      } else {
+        localStorage.setItem('darkMode', 'disabled');
+      }
+    });
+  }
+
+  if (darkModeMobileBtn) {
+    darkModeMobileBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      updateLogo(); // Sayfa yüklendiğinde logoyu güncelle
+
+      if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('darkMode', 'enabled');
+      } else {
+        localStorage.setItem('darkMode', 'disabled');
+      }
+    });
   }
 });
-// Butona tıklanınca dark mode aç/kapat ve logoyu güncelle
-document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-  updateLogo(); // Sayfa yüklendiğinde logoyu da güncelle
+ const logoLink = document.getElementById("logo");
 
-  if (document.body.classList.contains('dark-mode')) {
-    localStorage.setItem('darkMode', 'enabled');
-  } else {
-    localStorage.setItem('darkMode', 'disabled');
+  if (logoLink) {
+    logoLink.addEventListener("click", function (e) {
+      e.preventDefault(); // normal yönlendirmeyi durdur
+
+      const confirmLogout = confirm("Çıkış yapmak istediğinize emin misiniz?");
+      if (confirmLogout) {
+        window.location.href = "logout.php?redirect=index.php";
+      }
+    });
   }
-});
-});
 
   const avatarBtn = document.getElementById('avatarBtn');
   const dropdown = document.getElementById('dropdownMenu');
@@ -220,17 +247,21 @@ document.getElementById('dark-mode-toggle-mobile').addEventListener('click', () 
     document.getElementById("popupMenu").style.display = "none";
   }
 
+
   // Menü dışına tıklanınca dropdown kapanır
   window.addEventListener("click", function (e) {
     const dropdown = document.getElementById("dropdownMenu");
     const avatarBtn = document.getElementById("avatarBtn");
-        const popup = document.getElementById("popupMenu");
-
-    if (!dropdown.contains(e.target) && !avatarBtn.contains(e.target)  && !popup.contains(e.target)) {
+    if (!dropdown.contains(e.target) && !avatarBtn.contains(e.target)) {
       dropdown.style.display = "none";
+    }
 
-    } 
+    const popup = document.getElementById("popupMenu");
+    if (e.target === popup) {
+      closePopup();
+    }
   });
+
 
 
 </script>

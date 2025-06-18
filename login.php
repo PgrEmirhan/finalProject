@@ -87,8 +87,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         <h3 align="center" style="font-size: 32px;">Giriş Yap</h3>
         <form action="login.php" method="post"> 
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                <div class="kadi-icon">
-                <input type="text" name="username" id="kadi" placeholder="Kullanıcı adınız..." style="width: 100%;" pattern="^[a-zA-Z0-9._]{1,30}$"
+                <div class="uname-icon">
+                <input type="text" name="username" id="uname" placeholder="Kullanıcı adınız..." style="width: 100%;" pattern="^[a-zA-Z0-9._]{1,30}$"
                 title="Kullanıcı adı yalnızca harf, rakam, nokta (.) ve alt çizgi (_) içerebilir. Boşluk karakteri kullanılamaz." 
                 required>
                 <i class="fa-solid fa-user"></i>
@@ -99,7 +99,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
          required>
                 <i class="fa-solid fa-eye-slash" id="togglePassword"></i>
             </div>
-            <input type="submit" value="Giriş Yap" id="giris-btn">
+            <input type="submit" value="Giriş Yap" id="login-btn">
             <a href="forgot_password.php" style="color: red; text-decoration: none;">Parolamı Unuttum</a>
             <?php 
             if (isset($error_message)) {
