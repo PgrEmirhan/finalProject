@@ -1,0 +1,284 @@
+  body {        
+  font-family: 'Inter', sans-serif;   
+  overflow-x: hidden; 
+  color: black;
+  max-width: 600px; margin: auto; padding: 20px; 
+  overflow-y: hidden;
+}
+  body.dark-mode{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode header{
+    background-color: black;
+    color: rgb(255, 255, 255);
+    border-bottom: 2px solid white;
+  }
+  
+  body.dark-mode .nav-container{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode .nav-container a{
+    background-color: black;
+    color: rgb(255, 255, 255);
+  } 
+  body.dark-mode .nav-container .logo{ 
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode .nav-container .fa-solid{ 
+    color: rgb(255, 255, 255);
+  }
+  body.dark-mode main{ 
+    background-color: black;
+  }
+  body.dark-mode footer{ 
+    background-color: black;
+    color: white; 
+  } 
+  body.dark-mode footer i { 
+    color: white;
+  }   body.dark-mode #avatar { 
+    border:2px solid white;
+  } 
+
+  body.dark-mode footer span{ 
+    color: white;
+  } 
+  body.dark-mode .premium-price .price-card{
+    background-color: black; 
+    color: white;
+    border: 1px solid white;
+  } 
+  body.dark-mode .premium-price .price-card h4{ 
+    color: white;
+  } 
+  body.dark-mode footer span{ 
+    color: white;
+  } 
+    body.dark-mode footer{ 
+    background-color: black;
+    color: white; 
+    border-top: 2px solid;
+  } 
+  body.dark-mode footer i { 
+    color: white;
+  } 
+  body.dark-mode footer span{ 
+    color: white;
+  } 
+    body.dark-mode form::placeholder{ 
+    color: black;
+  } 
+  body.dark-mode   #dark-mode-toggle{
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid white;
+    border-radius: 100%;
+    font-size: 1.3rem;
+    background-color: transparent;
+    cursor: pointer;
+  }
+  #dark-mode-toggle{
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid;
+    border-radius: 100%;
+    font-size: 1.3rem;
+    background-color: transparent;
+    cursor: pointer;
+  }
+        .nav-container{ 
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: rgb(255, 255, 255);
+            color: white;
+            width: 100%;  
+            top: 0;
+            left: 0;    
+            position: fixed;
+            z-index: 1;
+            border-bottom: 2px solid;
+            }
+            .nav-container ul{
+            margin-left: 890px;
+            list-style-type: none; 
+            display:flex; 
+        }
+            .nav-container ul a{ 
+            text-decoration: none;
+            color: rgb(0, 0, 0); 
+            padding: 10px; 
+            font-size: 18px;
+            transition: all 0.7s;
+            background-color: rgb(255, 255, 255);
+        } 
+    main{
+        margin-top: 110px;
+        margin-bottom: 85px;
+    } 
+    label { display: block; margin-top: 10px; }
+    input[type="text"], input[type="email"], input[type="file"] { width: 100%; padding: 8px; margin-top: 4px; }
+    #avatar { margin-top: 10px; border-radius: 100%; background-color: gray; border: 2px solid black;}
+    .btn { display: inline-block; margin-top: 15px; padding: 10px 15px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; }
+     .btn-upload{ display: inline-block; margin-top: 15px; padding: 13px 35px; background: #28a745; color: white; text-decoration: none;border: none; border-radius: 5px; font-size: 14px; font-family: 'Inter',sans-serif;}
+    .back-on{
+      display: inline-block; margin-top: 15px; padding: 10px 15px; background:rgb(39, 133, 67); color: white; text-decoration: none; border-radius: 5px; 
+    }
+    .danger { background: #dc3545; }
+        footer {
+        background-color: black;
+        color: white;
+        width: 100%;  
+        padding: 10px;
+        position: absolute;  
+        bottom: auto;  
+        left: 0;
+        right: 0;  
+        text-align: center; 
+        font-family: 'Inter',sans-serif;
+        }
+
+        footer a{
+        text-decoration: none;
+        color: white;
+
+        }
+        .footer-nav{
+        display: flex;
+        justify-content: space-around;
+
+        }
+        .footer-nav ul{  list-style-type: none;
+        }
+
+
+    .user-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-mini {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.user-menu button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  z-index: 999;
+  border-radius: 8px;
+  padding: 8px 0;
+}
+
+.dropdown a {
+  color: #333;
+  padding: 25px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0px 8px;
+  font-size: 18px;
+}
+
+.dropdown a:hover {
+  background-color: #f2f2f2;
+}
+#avatarBtn{
+    background: rgb(201, 201, 201);
+    height: 50px;
+    outline: none;
+    border: none;
+    border-radius: 100%;
+    cursor: pointer;
+    outline: none;
+    border: none;
+} 
+#avatarBtn:active{
+    background: rgb(226, 226, 226);
+    height: 50px;
+    outline: none;
+    border: none;
+    border-radius: 100%;
+    cursor: pointer;
+}
+
+/* Mobil için (max 600px) */
+@media (max-width: 768px) {
+  body {
+    max-width: 100%;
+    padding: 10px;
+  }
+  .nav-container {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+  .nav-container ul {
+    margin-left: 0;
+    flex-direction: column;
+    width: 100%;
+  }
+  .nav-container ul li {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .nav-container ul a {
+    font-size: 16px;
+    padding: 8px 0;
+    display: block;
+  }
+  .nav-container img {
+    margin-right: 0;
+    margin-bottom: 10px;
+    width: 60px;
+  }
+  main {
+    margin-top: 100px;
+    padding: 55px; 
+  }
+  #avatar {
+    width: 80px !important;
+    height: 80px;
+  }
+  form input[type="text"],
+  form input[type="email"],
+  form input[type="file"] {
+    font-size: 14px;
+  }
+  form::placeholder{
+    color: #333;
+  }
+  .btn, .btn-upload, .back-on {
+    padding: 10px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  footer .footer-nav {
+    flex-direction: column;
+    align-items: center;
+            margin-right:40px;
+
+  }
+  footer .footer-nav ul {
+    margin-bottom: 15px;
+  }
+}
