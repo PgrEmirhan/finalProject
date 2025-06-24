@@ -52,6 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_type'])) {
     <ul class="nav-links">
     </ul> 
 
+<button id="dark-mode-toggle-desktop">
+      <i class="fa-solid fa-moon"></i>
+    </button> 
   <!-- Avatar Butonu -->
     <button id="avatarBtn">
       <?php if ($avatar): ?>
@@ -66,11 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_type'])) {
       <a href="profile.php"><i class="fa-solid fa-user"></i> Profilim</a>
       <a href="settings.php"><i class="fa-solid fa-cog"></i> Ayarlar</a>
       <a href="archive.php"><i class="fa-solid fa-box"></i> Arşivlerim</a>
-      <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a>
-              <li> <button id="dark-mode-toggle-desktop">
-      <i class="fa-solid fa-moon"></i>
-    </button> 
-</li>
+      <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a> 
     </div>
 
     <!-- Hamburger Menü (mobil) -->
