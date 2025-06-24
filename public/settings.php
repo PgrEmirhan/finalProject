@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="alert alert-danger"><?= $_SESSION['error'] ?></div>
     <?php unset($_SESSION['error']); ?>
   <?php endif; ?>
-  <form action="update_membership.php" method="POST" class="setting-card" id="membership-form">  
+  <form action="payment.php" method="POST" class="setting-card" id="membership-form">  
   <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
 
     <div class="title-box"><i class="fa-solid fa-id-card"></i> Üyelik Türü</div>
