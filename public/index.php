@@ -322,7 +322,7 @@ Sistemimiz, kullanıcılarımıza kolay ve güvenli dosya paylaşımı imkanı s
 
     <div class="price-card"> 
       <h3 style="font-size: 32px;"> Yıllık Üyelik </h3>    
-      <h4 style="font-size: 34px; color: black; width: 100%; height: 30px; ">Fiyat: 499,99 TL</h4>
+      <h4 style="font-size: 34px; color: black; width: 100%; height: 30px; ">Fiyat: 299,99 TL</h4>
       <ul>
         <li><i class="fa-solid fa-check"></i> 5 GB'a kadar tek dosya yükleme</li>
         <li><i class="fa-solid fa-check"></i> Gelişmiş dosya arşivleme ve filtreleme</li>
