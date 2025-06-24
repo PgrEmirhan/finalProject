@@ -3,9 +3,9 @@
     require 'connect.php'; 
     require 'csrf.php';
     $shareLink = '';  
-    $user_id = null; // Kullanıcı ID'si boş, kullanıcı girişine göre güncellenecek
+    $user_id = null;
 
-    // Dosya yükleme işlemi
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     $file = $_FILES['file'];
     $fileName = $file['name'];
