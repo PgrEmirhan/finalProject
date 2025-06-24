@@ -107,6 +107,12 @@ $user = $stmt->fetch();
   <label><strong>Yeni Avatar Yükle</strong><br>
     <input type="file" name="avatar">
   </label>
+<?php if ($avatar): ?>
+  <label style="display: block; margin-top: 10px;">
+    <input type="checkbox" name="delete_avatar" value="1">
+    Mevcut avatarı sil
+  </label>
+<?php endif; ?>
 
 <button type="submit" class="upgrade">Güncelle</button>
 
