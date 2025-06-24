@@ -50,19 +50,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <form method="POST" action="">    
     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-    <label>Mevcut Şifre:
+    <label>Mevcut Parola:
         <input type="password" name="old_password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$">
     </label><br><br>
 
-    <label>Yeni Şifre:
+    <label>Yeni Parola:
         <input type="password" name="new_password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$">
     </label><br><br>
 
-    <label>Yeni Şifre (Tekrar):
+    <label>Yeni Parola (Tekrar):
         <input type="password" name="confirm_password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$">
     </label><br><br>
 
-    <button type="submit">Şifreyi Güncelle</button>
+    <button type="submit">Parola Güncelle</button>
 </form>
 
 <a href="profile.php">Profil sayfasına dön</a>
