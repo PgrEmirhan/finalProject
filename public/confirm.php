@@ -70,6 +70,8 @@ try {
     <p>Ödemeniz başarıyla alındı. Artık özel üyelik ayrıcalıklarından yararlanabilirsiniz.</p>
     <p style="font-weight: bold; margin-top: 10px;">Gelişmiş dosya yükleme, hızlı indirme ve reklamsız deneyim sizi bekliyor!</p>
     <a href="upload.php" style="display: inline-block; margin-top: 25px; padding: 12px 30px; background-color: black; color: white; border-radius: 5px; text-decoration: none;">Yükleme ekranına dön</a>
+      <a href="settings.php" style="display: inline-block; margin-top: 25px; padding: 12px 30px; background-color: black; color: white; border-radius: 5px; text-decoration: none;">Ayarlar ekranına dön</a>
+
   </div>
 </main>
  
