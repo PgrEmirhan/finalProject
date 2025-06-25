@@ -56,35 +56,7 @@
       dropdown.style.display = 'none';
     });
 
-  function openShareModal(fileName, fileId) {
-      const link = "http://localhost/finalProject/public/uploads/" + fileName;
-      document.getElementById("shareLink").value = link;
-      document.getElementById("modalFileId").value = fileId;
-      document.getElementById("shareModal").style.display = "block";
-      document.getElementById("overlay").style.display = "block";
-  }
-
-  function closeModal() {
-      document.getElementById("shareModal").style.display = "none";
-      document.getElementById("overlay").style.display = "none";
-  }
-
-  function copyLink() {
-      const copyText = document.getElementById("shareLink");
-      copyText.select();
-      copyText.setSelectionRange(0, 99999);
-      document.execCommand("copy");
-      alert("Link panoya kopyalandı: " + copyText.value);
-  }
-
-  function toggleShareOptions() {
-      const shareType = document.getElementById("shareType").value;
-      document.getElementById("passwordField").style.display = (shareType === "private") ? "block" : "none";
-  }
-  document.getElementById('dark-mode-toggle').addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-  }); 
-  });
+   });
 
     function openPopup() {
       document.getElementById("popupMenu").style.display = "flex";
